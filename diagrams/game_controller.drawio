@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-01-05T08:18:51.034Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="iOTSj-7H_KfbBUbbdO6C" version="22.1.16" type="device">
+<mxfile host="app.diagrams.net" modified="2024-01-05T08:24:06.323Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" etag="LUEQjeTckM1XD_8-vH3s" version="22.1.16" type="device">
   <diagram name="Page-1" id="55WW11rG-zNoPXHS6EC5">
-    <mxGraphModel dx="1434" dy="866" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="574" dy="346" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -143,7 +143,7 @@
         <mxCell id="VFZQZjxXLKgfuindXXzm-114" value="paddle_x_min" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=6;points=[];" vertex="1" parent="VFZQZjxXLKgfuindXXzm-115">
           <mxGeometry y="140" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="VFZQZjxXLKgfuindXXzm-172" value="image_visible" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=6;points=[];" vertex="1" parent="VFZQZjxXLKgfuindXXzm-115">
+        <mxCell id="VFZQZjxXLKgfuindXXzm-172" value="new_frame" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=6;points=[];" vertex="1" parent="VFZQZjxXLKgfuindXXzm-115">
           <mxGeometry x="140" y="100" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="VFZQZjxXLKgfuindXXzm-150" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="VFZQZjxXLKgfuindXXzm-102" target="VFZQZjxXLKgfuindXXzm-142">
