@@ -1,3 +1,8 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.mat_real.all;
+
 entity accelerometer_test is
   port (
     adc_clk_10 : in std_logic;
@@ -12,7 +17,7 @@ entity accelerometer_test is
     gsensor_int : in std_logic_vector(1 downto 0);
     gsensor_sclk : out std_logic;
     gsensor_sdi : inout std_logic;
-    gsensor_sdo : inout std_logic;
+    gsensor_sdo : inout std_logic
 
   );
 end entity accelerometer_test;
