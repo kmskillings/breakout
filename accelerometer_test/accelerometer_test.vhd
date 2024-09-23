@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.mat_real.all;
+use ieee.math_real.all;
 
 entity accelerometer_test is
   port (
