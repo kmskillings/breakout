@@ -14,7 +14,7 @@ architecture tb of tb_spi_master is
   -------------------- General settings --------------------
 
   -- Master clock
-  constant clock_master_frequency : positive := 5_000_000;
+  constant clock_master_frequency : positive := 50_000_000;
   constant clock_master_period : time := 1 sec / clock_master_frequency;
   
   -- A short time to ensure that testbench events always happen after the
@@ -25,9 +25,15 @@ architecture tb of tb_spi_master is
   -------------------- Timing settings --------------------
   
   -- Reset at the beginning of the simulation to initialize DUT
-  constant reset_duration_cycles : real := 3.2;
-  constant reset_duration : time := reset_duration_cycles * clock_master_period;
+  constant reset_initial_duration_cycles : real := 3.2;
+  constant reset_initial_duration : time := reset_initial_duration_cycles * clock_master_period;
   
+  -- Reset in the middle of operation to test weird states
+  constant reset_middle_delay_cycles : real := 30;
+  constant reset_middle_delay : time := reset_middle_delay_cycles * clock_master_period + short_time;
+  constant reset_middle_duration_cycles : real := 9.7;
+  constant reset_middle_duration : time := reset_middle_duration_cycles * clock_master_period + short_time;
+
   -- Executes a transaction
   constant go_delay_cycles : real := 5.0;
   constant go_delay : time := go_delay_cycles * clock_master_period + short_time;
@@ -64,9 +70,12 @@ begin
   process
   begin
     reset_n <= '0';
-    wait for reset_duration;
+    wait for reset_initial_duration;
     reset_n <= '1';
-    wait;
+    wait for reset_middle_delay;
+    reset_n <= '0';
+    wait for reset_middle_duration;
+    reset_n <= '1';
   end process;
 
   -- Generates the go signal
