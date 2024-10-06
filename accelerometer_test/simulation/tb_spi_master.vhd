@@ -21,24 +21,51 @@ architecture tb of tb_spi_master is
 
   -------------------- Timing settings --------------------
   
-  -- Reset at the beginning of the simulation to 
+  -- Reset at the beginning of the simulation to initialize DUT
   constant reset_duration_cycles : real := 3.2;
   constant reset_duration : time := reset_duration_cycles * clock_master_period;
   
-  -- A pause occuring in the middle of the testbench
-  constant pause_delay_cycles : real := 11;
-  constant pause_duration_cycles : real := 16;
-  constant pause_delay : time := pause_delay_cycles * clock_master_period + short_time;
-  constant pause_duration : time := pause_duration_cycles * clock_master_period + short_time;
+  -- Executes a transaction
+  constant go_delay_cycles : real := 5;
+  constant go_delay : time := go_delay_cycles * clock_master_period + short_time;
+  constant go_duration : time := clock_master_period;
 
   -------------------- Testbench signals --------------------
 
   -- Interface signals
   signal clock_master : std_logic;
-  signal enable : std_logic;
+  signal reset_n : std_logic;
+  signal go : std_logic;
 
 begin
 
-  
+  -- Generate the master clock signal.
+  process
+  begin
+    clock_master <= 0;
+    wait for clock_master_period / 2;
+    clock_master <= 1;
+    wait for clock_master_period / 2;
+  end process;
 
+  -- Generates the reset signal.
+  process
+  begin
+    reset_n <= '0';
+    wait for reset_duration;
+    reset_n <= '1';
+    wait;
+  end process;
+
+  -- Generates the go signal
+  process
+  begin
+    go <= '0';
+    wait for go_delay;
+    go <= '1';
+    wait for go_duration;
+    go <= '0';
+    wait;
+  end process;
+  
 end architecture ; -- tb
