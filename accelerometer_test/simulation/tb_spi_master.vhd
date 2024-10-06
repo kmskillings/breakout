@@ -54,9 +54,9 @@ begin
   -- Generate the master clock signal.
   process
   begin
-    clock_master <= '0';
-    wait for clock_master_period / 2;
     clock_master <= '1';
+    wait for clock_master_period / 2;
+    clock_master <= '0';
     wait for clock_master_period / 2;
   end process;
 
