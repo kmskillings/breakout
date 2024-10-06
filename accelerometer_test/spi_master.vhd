@@ -150,7 +150,7 @@ begin
       end if;
     end if;
   end process;
-  spi_sclk_int <= spi_sclk_n;
+  spi_sclk_int <= not spi_sclk_n;
   
 
 end architecture; -- rtl
