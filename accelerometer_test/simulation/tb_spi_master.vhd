@@ -29,7 +29,7 @@ architecture tb of tb_spi_master is
   constant reset_initial_duration : time := reset_initial_duration_cycles * clock_master_period;
   
   -- Reset in the middle of operation to test weird states
-  constant reset_middle_delay_cycles : real := 30;
+  constant reset_middle_delay_cycles : real := 30.0;
   constant reset_middle_delay : time := reset_middle_delay_cycles * clock_master_period + short_time;
   constant reset_middle_duration_cycles : real := 9.7;
   constant reset_middle_duration : time := reset_middle_duration_cycles * clock_master_period + short_time;
