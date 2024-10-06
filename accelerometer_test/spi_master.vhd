@@ -40,44 +40,43 @@ architecture rtl of spi_master is
   -- Note that this will always be either equal to or longer than period_high.
   constant period_low : positive := clock_divider - period_high;
 
-  -- output mirrors
-  signal spi_csn_int : std_logic;
-  signal spi_sclk_int : std_logic;
-
+  -- A combinational signal that signals the beginning of a new transaction.
+  -- Used to initialize counters and control registers for the transaction.
   signal start : std_logic;
-  signal start_d1 : std_logic;
 
+  -- Because spi_sclk idles high and the Max10 only supports asynchronous
+  -- clear, spi_sclk must be controlled via its inverse.
   signal spi_sclk_n : std_logic;
-  signal sclk_rising_edge : std_logic;
-  signal sclk_falling_edge : std_logic;
 
+  -- Because spi_csn idles high and the Max10 only supports asynchronous clear,
+  -- spi_scn must be controlled via its inverse.
   signal spi_cs : std_logic;
 
+  -- Counts down while the transaction is running. Whenever it reaches 0, the
+  -- value of spi_sclk (via spi_sclk_n) toggles.
   signal counter_clock : natural range 0 to period_low - 1;
 
-  -- Which bit of the transaction is currently being transferred. Counts down
-  -- to 0 at the end of the transaction.
-  signal counter_transaction : natural range 0 to transaction_bits - 1;
+  -- Counts the number of bits that still remain to be shifted in during the
+  -- transaction. The transaction ends immediately after this reaches zero.
+  signal counter_transaction : natural range 0 to transaction_bits;
+
+  -- A combinational signal that signals that a new bit is about to be shifted
+  -- out, corresponding to the falling edge of spi_sclk.
+  signal shift_out : std_logic;
+
+  -- A combinational signal that signals that a new bit is about to be shifted
+  -- in, corresponding to the rising edge of the spi_sclk.
+  signal shift_in : std_logic;
 
 begin
 
-  -- output mirrors
-  spi_csn <= spi_csn_int;
-  spi_sclk <= spi_sclk_int;
+  -- A transaction starts whenever the "go" signal goes ghigh and a transaction
+  -- is not currently in progress.
+  start <= go and not spi_cs;
 
-  start <= go and spi_csn_int;
-  process(clock_master, reset_n)
-  begin
-    if reset_n = '0' then
-      start_d1 <= '0';
-    elsif rising_edge(clock_master) then
-      start_d1 <= start;
-    end if;
-  end process;
-
-  -- spi_csn goes low when the go control signal goes high while a transaction
-  -- isn't in progress (spi_csn is high). spi_csn goes high again after all
-  -- bits have been shifted and spi_sclk is high.
+  -- spi_cs goes high (making spi_csn go low) whenevever a transaction starts.
+  -- spi_cs goes low (making spi_csn go high) immediately after the last bit
+  -- has been shifted in.
   process(clock_master, reset_n)
   begin
     if reset_n = '0' then
@@ -85,28 +84,23 @@ begin
     elsif rising_edge(clock_master) then
       if start = '1' then
         spi_cs <= '1';
-      elsif 
-        counter_transaction = 0 and 
-        spi_sclk_int = '1' and 
-        spi_cs = '1' and
-        start_d1 = '0'
-      then
+      elsif spi_cs = '1' and counter_transaction = 0 then
         spi_cs <= '0';
       end if;
     end if;
   end process;
-  spi_csn_int <= not spi_cs;
+  spi_csn <= not spi_cs;
 
-  -- One clock cycle after the beginning of a cycle, counter_transaction is set to its
-  -- maximum value. On each falling edge of spi_sclk, it decrements.
-  -- This process has no asynchronous reset because counter_transaction doesn't affect
-  -- anything while a transaction isn't in progress.
+  -- At the beginning of a transaction, no bits have been shifted in yet.
+  -- Whenever a bit is shifted in, the transaction counter decrements. Because
+  -- the counter is loaded with the correct value at the beginning of every
+  -- transaction, no asynchronous reset is necessary.
   process(clock_master)
   begin
     if rising_edge(clock_master) then
-      if start_d1 = '1' then
-        counter_transaction <= transaction_bits - 1;
-      elsif sclk_falling_edge = '1' and spi_csn_int = '0' then
+      if start = '1' then
+        counter_transaction <= transaction_bits;
+      elsif spi_cs = '1' and shift_in = '1' then
         counter_transaction <= counter_transaction - 1;
       end if;
     end if;
@@ -123,12 +117,16 @@ begin
     if rising_edge(clock_master) then
       if start = '1' then
         counter_clock <= 0; -- Starts at 0 so that spi_sclk goes low next tick.
-      elsif spi_csn_int = '0' then -- Counter only ticks during a transaction
+      elsif spi_cs = '1' then -- Counter only ticks during a transaction
         if counter_clock = 0 then
-          if spi_sclk_int = '1' then
-            counter_clock <= period_low - 1;
-          elsif spi_sclk_int = '0' then
+          if spi_sclk_n = '1' then 
+            -- spi_sclk_n is high, which means spi_sclk is low, which means
+            -- spi_sclk is about to go high.
             counter_clock <= period_high - 1;
+          elsif spi_sclk_n = '0' then
+            -- spi_sclk_n is low, which means spi_sclk is high, which means
+            -- spi_sclk is about to go low.
+            counter_clock <= period_low - 1;
           end if;
         else
           counter_clock <= counter_clock - 1;
@@ -136,11 +134,17 @@ begin
       end if;
     end if;
   end process;
-  sclk_rising_edge <= 
-    '1' when counter_clock = 0 and spi_sclk_int = '0' else
+  
+  -- Bits are shifted out on the falling edge of spi_sclk, which corresponds
+  -- to the rising edge of spi_sclk_n.
+  shift_out <= 
+    '1' when counter_clock = 0 and spi_sclk_n = '0' else
     '0';
-  sclk_falling_edge <= 
-    '1' when counter_clock = 0 and spi_sclk_int = '1' else
+
+  -- Bits are shifted in on the rising edge of spi_sclk, which corresponds
+  -- to the falling edge of spi_sclk_n.
+  shift_in <=
+    '1' when counter_clock = 0 and spi_sclk_n = '1' else
     '0';
 
   -- Whenever the clock counter reaches zero, the spi_sclk toggles. spi_sclk
@@ -150,12 +154,12 @@ begin
     if reset_n = '0' then
       spi_sclk_n <= '0';
     elsif rising_edge(clock_master) then
-      if spi_csn_int = '0' and counter_clock = 0 then
+      if spi_cs = '1' and counter_clock = 0 then
         spi_sclk_n <= not spi_sclk_n;
       end if;
     end if;
   end process;
-  spi_sclk_int <= not spi_sclk_n;
+  spi_sclk <= not spi_sclk_n;
   
 
 end architecture; -- rtl
