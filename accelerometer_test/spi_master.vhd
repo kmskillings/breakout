@@ -6,7 +6,7 @@ use ieee.math_real.all;
 library work;
 use work.spi_common.all;
 
-entity ent is
+entity spi_master is
   generic (
     clock_divider : positive;
     transaction_bits : natural
@@ -27,18 +27,18 @@ entity ent is
     spi_sdo : out std_logic
 
   );
-end ent;
+end spi_master;
 
 architecture rtl of spi_master is
 
   -- clock constants
 
   -- The period spi_sclk is high for during a spi cycle.
-  constant period_high : natural clock_divider / 2;
+  constant period_high : natural := clock_divider / 2;
 
   -- The period spi_sclk is low for during a spi cycle
   -- Note that this will always be either equal to or longer than period_high.
-  constant period_low : positive clock_divider - period_high;
+  constant period_low : positive := clock_divider - period_high;
 
   -- output mirrors
   signal spi_csn_int : std_logic;
@@ -90,7 +90,7 @@ begin
       end if;
     end if;
   end process;
-  spi_csn_int = not spi_cs;
+  spi_csn_int <= not spi_cs;
 
   -- One clock cycle after the beginning of a cycle, bit_index is set to its
   -- maximum value. On each falling edge of spi_sclk, it decrements.
@@ -114,10 +114,11 @@ begin
   -- beginning of a transaction, the spi sclk is loaded with the correct value.
   -- Because of this, no asynchronous reset is necessary.
   process(clock_master)
+  begin
     if rising_edge(clock_master) then
       if start = '1' then
-        counter_clock = 0; -- Starts at 0 so that spi_sclk goes low next tick.
-      elsif spi_csn_int = '0' -- Counter only ticks during a transaction
+        counter_clock <= 0; -- Starts at 0 so that spi_sclk goes low next tick.
+      elsif spi_csn_int = '0' then -- Counter only ticks during a transaction
         if counter_clock = 0 then
           if spi_sclk_int = '1' then
             counter_clock <= period_low;
@@ -149,7 +150,7 @@ begin
       end if;
     end if;
   end process;
-  spi_sclk_int <- spi_sclk_n;
+  spi_sclk_int <= spi_sclk_n;
   
 
 end architecture; -- rtl
