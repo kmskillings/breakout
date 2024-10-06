@@ -35,9 +35,13 @@ architecture tb of tb_spi_master is
   constant reset_middle_duration : time := reset_middle_duration_cycles * clock_master_period + short_time;
 
   -- Executes a transaction
-  constant go_delay_cycles : real := 5.0;
-  constant go_delay : time := go_delay_cycles * clock_master_period + short_time;
-  constant go_duration : time := clock_master_period;
+  constant go1_delay_cycles : real := 5.0;
+  constant go1_delay : time := go1_delay_cycles * clock_master_period + short_time;
+  constant go1_duration : time := clock_master_period;
+
+  constant go2_delay_cycles : real := 40.0;
+  constant go2_delay : time := go2_delay_cycles * clock_master_period + short_time;
+  constant go2_duration : time := clock_master_period;
 
   -------------------- DUT settings --------------------
 
@@ -76,15 +80,20 @@ begin
     reset_n <= '0';
     wait for reset_middle_duration;
     reset_n <= '1';
+    wait;
   end process;
 
   -- Generates the go signal
   process
   begin
     go <= '0';
-    wait for go_delay;
+    wait for go1_delay;
     go <= '1';
-    wait for go_duration;
+    wait for go1_duration;
+    go <= '0';
+    wait for go2_delay;
+    go <= '1';
+    wait for go2_duration;
     go <= '0';
     wait;
   end process;
