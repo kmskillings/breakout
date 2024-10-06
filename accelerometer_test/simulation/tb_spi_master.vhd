@@ -3,6 +3,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.math_real.all;
 
+library work;
+use work.spi_common.all;
+
 entity tb_spi_master is
 end tb_spi_master ;
 
@@ -30,12 +33,21 @@ architecture tb of tb_spi_master is
   constant go_delay : time := go_delay_cycles * clock_master_period + short_time;
   constant go_duration : time := clock_master_period;
 
+  -------------------- DUT settings --------------------
+
+  constant clock_divider : positive := 6;
+  constant transaction_bits : natural := 8;
+
   -------------------- Testbench signals --------------------
 
   -- Interface signals
   signal clock_master : std_logic;
   signal reset_n : std_logic;
   signal go : std_logic;
+  signal spi_csn : std_logic;
+  signal spi_sclk : std_logic;
+  signal spi_sdi : std_logic;
+  signal spi_sdo : std_logic;
 
 begin
 
@@ -67,5 +79,21 @@ begin
     go <= '0';
     wait;
   end process;
+
+  DUT : spi_master
+    generic map (
+      clock_divider => clock_divider,
+      transaction_bits => transaction_bits
+    )
+    port map (
+      clock_master => clock_master,
+      reset_n => reset_n,
+      go => go,
+      spi_csn => spi_csn,
+      spi_sclk => spi_sclk,
+      spi_sdi => spi_sdi,
+      spi_sdo => spi_sdo
+    )
+  ;
 
 end architecture ; -- tb
