@@ -9,7 +9,9 @@ use work.spi_common.all;
 entity spi_master is
   generic (
     clock_divider : positive;
-    transaction_bits : natural
+    transaction_bits : natural;
+    register_out_width : natural;
+    register_in_width : natural
   );
   port (
 
@@ -18,6 +20,8 @@ entity spi_master is
     reset_n : in std_logic;
 
     -- control interface
+    transmit_data : in std_logic_vector(register_out_width - 1 downto 0);
+    receive_data : out std_logic_vector(register_in_width - 1 downto 0);
     go : in std_logic;  -- spi transaction begins when this goes high
 
     -- spi interface
@@ -30,8 +34,6 @@ entity spi_master is
 end spi_master;
 
 architecture rtl of spi_master is
-
-  -- clock constants
 
   -- The period spi_sclk is high for during a spi cycle.
   constant period_high : natural := clock_divider / 2;
@@ -67,6 +69,12 @@ architecture rtl of spi_master is
   -- A combinational signal that signals that a new bit is about to be shifted
   -- in, corresponding to the rising edge of the spi_sclk.
   signal shift_in : std_logic;
+
+  -- A shift register that contains the data the SPI is shifting out.
+  signal register_out : std_logic_vector(register_out_width - 1 downto 0);
+
+  -- A shhift register that contains the data the SPI is shifting in.
+  signal register_in : std_logic_vector(register_in_width - 1 downto 0);
 
 begin
 
@@ -138,13 +146,13 @@ begin
   -- Bits are shifted out on the falling edge of spi_sclk, which corresponds
   -- to the rising edge of spi_sclk_n.
   shift_out <= 
-    '1' when counter_clock = 0 and spi_sclk_n = '0' else
+    '1' when counter_clock = 0 and spi_sclk_n = '0' and spi_cs = '1' else
     '0';
 
   -- Bits are shifted in on the rising edge of spi_sclk, which corresponds
   -- to the falling edge of spi_sclk_n.
   shift_in <=
-    '1' when counter_clock = 0 and spi_sclk_n = '1' else
+    '1' when counter_clock = 0 and spi_sclk_n = '1' and spi_cs = '1' else
     '0';
 
   -- Whenever the clock counter reaches zero, the spi_sclk toggles. spi_sclk
@@ -161,5 +169,46 @@ begin
   end process;
   spi_sclk <= not spi_sclk_n;
   
+  -- The data out register is loaded at the beginning of a transaction. Data is
+  -- then shifted out on every falling edge of spi_sclk (while the spi is
+  -- running). Data is shifted out to the left. Because the data out register
+  -- is loaded at the beginning of every transaction, asynchronous reset is not
+  -- necessary.
+  process(clock_master)
+  begin
+    if rising_edge(clock_master) then
+      if start = '1' then
+        register_out <= transmit_data;
+      elsif shift_out = '1' then
+        register_out(register_out_width - 1 downto 1) <= register_out(register_out_width - 2 downto 0);
+        register_out(0) <= 'X';
+      end if;
+    end if;
+  end process;
+
+  -- Data is placed on sdo after being shifted off the left side of the output
+  -- register. Because this is always set to something before being consumed by
+  -- the slave, no asynchronous reset is necessary.
+  process(clock_master)
+  begin
+    if rising_edge(clock_master) then
+      if shift_out = '1' then
+        spi_sdo <= register_out(register_out_width - 1);
+      end if;
+    end if;
+  end process;
+
+  -- Data is shifted in on every rising edge of the spi_sclk. Because this
+  -- register is populated before being read, no ansynchronous reset is
+  -- necessary.
+  process(clock_master)
+  begin
+    if rising_edge(clock_master) then
+      if shift_in = '1' then
+        register_in(0) <= spi_sdi;
+        register_in(register_in_width - 1 downto 1) <= register_in(register_in_width - 2 downto 0);
+      end if;
+    end if;
+  end process;
 
 end architecture; -- rtl
