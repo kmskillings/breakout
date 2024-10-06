@@ -121,9 +121,9 @@ begin
       elsif spi_csn_int = '0' then -- Counter only ticks during a transaction
         if counter_clock = 0 then
           if spi_sclk_int = '1' then
-            counter_clock <= period_low;
+            counter_clock <= period_low - 1;
           elsif spi_sclk_int = '0' then
-            counter_clock <= period_high;
+            counter_clock <= period_high - 1;
           end if;
         else
           counter_clock <= counter_clock - 1;
