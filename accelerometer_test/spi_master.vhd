@@ -85,7 +85,12 @@ begin
     elsif rising_edge(clock_master) then
       if start = '1' then
         spi_cs <= '1';
-      elsif counter_transaction = 0 and spi_sclk_int = '1' and spi_cs = '1' then
+      elsif 
+        counter_transaction = 0 and 
+        spi_sclk_int = '1' and 
+        spi_cs = '1' and
+        start_d1 = '0'
+      then
         spi_cs <= '0';
       end if;
     end if;
@@ -101,7 +106,7 @@ begin
     if rising_edge(clock_master) then
       if start_d1 = '1' then
         counter_transaction <= transaction_bits - 1;
-      elsif sclk_falling_edge = '1' then
+      elsif sclk_falling_edge = '1' and spi_csn_int = '0' then
         counter_transaction <= counter_transaction - 1;
       end if;
     end if;
