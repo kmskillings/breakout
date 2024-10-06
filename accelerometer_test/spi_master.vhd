@@ -57,7 +57,7 @@ architecture rtl of spi_master is
 
   -- Which bit of the transaction is currently being transferred. Counts down
   -- to 0 at the end of the transaction.
-  signal bit_index : natural range 0 to transaction_bits - 1;
+  signal counter_transaction : natural range 0 to transaction_bits - 1;
 
 begin
 
@@ -85,24 +85,24 @@ begin
     elsif rising_edge(clock_master) then
       if start = '1' then
         spi_cs <= '1';
-      elsif bit_index = 0 and spi_sclk_int = '1' and spi_cs = '1' then
+      elsif counter_transaction = 0 and spi_sclk_int = '1' and spi_cs = '1' then
         spi_cs <= '0';
       end if;
     end if;
   end process;
   spi_csn_int <= not spi_cs;
 
-  -- One clock cycle after the beginning of a cycle, bit_index is set to its
+  -- One clock cycle after the beginning of a cycle, counter_transaction is set to its
   -- maximum value. On each falling edge of spi_sclk, it decrements.
-  -- This process has no asynchronous reset because bit_index doesn't affect
+  -- This process has no asynchronous reset because counter_transaction doesn't affect
   -- anything while a transaction isn't in progress.
   process(clock_master)
   begin
     if rising_edge(clock_master) then
       if start_d1 = '1' then
-        bit_index <= transaction_bits - 1;
+        counter_transaction <= transaction_bits - 1;
       elsif sclk_falling_edge = '1' then
-        bit_index <= bit_index - 1;
+        counter_transaction <= counter_transaction - 1;
       end if;
     end if;
   end process;
