@@ -17,7 +17,7 @@ architecture tb of tb_spi_master is
   -- A short time to ensure that testbench events always happen after the
   -- corresponding clock edges
   constant short_time_cycles : real := 0.01;
-  constant short_time : time := short_time_cycles * clock_master_frequency;
+  constant short_time : time := short_time_cycles * clock_master_period;
 
   -------------------- Timing settings --------------------
   
@@ -26,7 +26,7 @@ architecture tb of tb_spi_master is
   constant reset_duration : time := reset_duration_cycles * clock_master_period;
   
   -- Executes a transaction
-  constant go_delay_cycles : real := 5;
+  constant go_delay_cycles : real := 5.0;
   constant go_delay : time := go_delay_cycles * clock_master_period + short_time;
   constant go_duration : time := clock_master_period;
 
@@ -42,9 +42,9 @@ begin
   -- Generate the master clock signal.
   process
   begin
-    clock_master <= 0;
+    clock_master <= '0';
     wait for clock_master_period / 2;
-    clock_master <= 1;
+    clock_master <= '1';
     wait for clock_master_period / 2;
   end process;
 
@@ -67,5 +67,5 @@ begin
     go <= '0';
     wait;
   end process;
-  
+
 end architecture ; -- tb
