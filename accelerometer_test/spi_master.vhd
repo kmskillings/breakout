@@ -10,8 +10,8 @@ entity spi_master is
   generic (
     clock_divider : positive;
     transaction_bits : natural;
-    register_out_width : natural;
-    register_in_width : natural
+    transmit_data_width : natural;
+    receive_data_width : natural
   );
   port (
 
@@ -20,8 +20,8 @@ entity spi_master is
     reset_n : in std_logic;
 
     -- control interface
-    transmit_data : in std_logic_vector(register_out_width - 1 downto 0);
-    receive_data : out std_logic_vector(register_in_width - 1 downto 0);
+    transmit_data : in std_logic_vector(transmit_data_width - 1 downto 0);
+    receive_data : out std_logic_vector(receive_data_width - 1 downto 0);
     go : in std_logic;  -- spi transaction begins when this goes high
     done : out std_logic; -- spi transaction concludes when this goes high
 
@@ -72,10 +72,10 @@ architecture rtl of spi_master is
   signal shift_in : std_logic;
 
   -- A shift register that contains the data the SPI is shifting out.
-  signal register_out : std_logic_vector(register_out_width - 1 downto 0);
+  signal register_out : std_logic_vector(transmit_data_width - 1 downto 0);
 
   -- A shhift register that contains the data the SPI is shifting in.
-  signal register_in : std_logic_vector(register_in_width - 1 downto 0);
+  signal register_in : std_logic_vector(receive_data_width - 1 downto 0);
 
 begin
 
@@ -197,7 +197,7 @@ begin
       if start = '1' then
         register_out <= transmit_data;
       elsif shift_out = '1' then
-        register_out(register_out_width - 1 downto 1) <= register_out(register_out_width - 2 downto 0);
+        register_out(transmit_data_width - 1 downto 1) <= register_out(transmit_data_width - 2 downto 0);
         register_out(0) <= 'X';
       end if;
     end if;
@@ -210,7 +210,7 @@ begin
   begin
     if rising_edge(clock_master) then
       if shift_out = '1' then
-        spi_sdo <= register_out(register_out_width - 1);
+        spi_sdo <= register_out(transmit_data_width - 1);
       end if;
     end if;
   end process;
@@ -223,7 +223,7 @@ begin
     if rising_edge(clock_master) then
       if shift_in = '1' then
         register_in(0) <= spi_sdi;
-        register_in(register_in_width - 1 downto 1) <= register_in(register_in_width - 2 downto 0);
+        register_in(receive_data_width - 1 downto 1) <= register_in(receive_data_width - 2 downto 0);
       end if;
     end if;
   end process;

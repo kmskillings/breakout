@@ -9,8 +9,8 @@ component spi_master is
   generic (
     clock_divider : positive;
     transaction_bits : natural;
-    register_out_width : natural;
-    register_in_width : natural
+    transmit_data_width : natural;
+    receive_data_width : natural
   );
   port (
 
@@ -19,8 +19,8 @@ component spi_master is
     reset_n : in std_logic;
 
     -- control interface
-    transmit_data : in std_logic_vector(register_out_width - 1 downto 0);
-    receive_data : out std_logic_vector(register_in_width - 1 downto 0);
+    transmit_data : in std_logic_vector(transmit_data_width - 1 downto 0);
+    receive_data : out std_logic_vector(receive_data_width - 1 downto 0);
     go : in std_logic;  -- spi transaction begins when this goes high
     done : out std_logic; -- spi transaction concludes when this goes high
 
