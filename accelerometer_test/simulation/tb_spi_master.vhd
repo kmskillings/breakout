@@ -25,39 +25,38 @@ architecture tb of tb_spi_master is
   -------------------- Timing settings --------------------
   
   -- Reset at the beginning of the simulation to initialize DUT
-  constant reset_initial_duration_cycles : real := 3.2;
-  constant reset_initial_duration : time := reset_initial_duration_cycles * clock_master_period;
+  constant reset_duration_cycles : real := 3.2;
+  constant reset_duration : time := reset_duration_cycles * clock_master_period;
   
-  -- Reset in the middle of operation to test weird states
-  constant reset_middle_delay_cycles : real := 30.0;
-  constant reset_middle_delay : time := reset_middle_delay_cycles * clock_master_period + short_time;
-  constant reset_middle_duration_cycles : real := 9.7;
-  constant reset_middle_duration : time := reset_middle_duration_cycles * clock_master_period + short_time;
-
-  -- Executes a transaction
-  constant go1_delay_cycles : real := 5.0;
-  constant go1_delay : time := go1_delay_cycles * clock_master_period + short_time;
-  constant go1_duration : time := clock_master_period;
-
-  constant go2_delay_cycles : real := 40.0;
-  constant go2_delay : time := go2_delay_cycles * clock_master_period + short_time;
-  constant go2_duration : time := clock_master_period;
+  -- Timing for transactions
+  constant delay_between_transactions_cycles : real := 5.0;
+  constant delay_between_transactions : time := delay_between_transactions_cycles * clock_master_period;
 
   -------------------- DUT settings --------------------
 
   constant clock_divider : positive := 6;
   constant transaction_bits : natural := 8;
+  constant transmit_data_width : natural := 8;
+  constant receive_data_width : natural := 8;
 
   -------------------- Testbench signals --------------------
 
   -- Interface signals
   signal clock_master : std_logic;
   signal reset_n : std_logic;
+  signal transmit_data : std_logic_vector(transmit_data_width - 1 downto 0);
+  signal receive_data : std_logic_vector(receive_data_width - 1 downto 0);
   signal go : std_logic;
+  signal done : std_logic;
   signal spi_csn : std_logic;
   signal spi_sclk : std_logic;
   signal spi_sdi : std_logic;
   signal spi_sdo : std_logic;
+
+  -- The "other side" of the SPI
+  signal transmitted_data : std_logic_vector(transmit_data_width - 1 downto 0);
+  signal response_data : unsigned(receive_data_width - 1 downto 0) := to_unsigned(0, receive_data_width);
+  signal counter_transaction : natural range 0 to transaction_bits;
 
 begin
 
@@ -74,11 +73,7 @@ begin
   process
   begin
     reset_n <= '0';
-    wait for reset_initial_duration;
-    reset_n <= '1';
-    wait for reset_middle_delay;
-    reset_n <= '0';
-    wait for reset_middle_duration;
+    wait for reset_duration;
     reset_n <= '1';
     wait;
   end process;
@@ -86,27 +81,54 @@ begin
   -- Generates the go signal
   process
   begin
-    go <= '0';
-    wait for go1_delay;
+    wait until rising_edge(reset_n) or (done = '1');
+    wait until rising_edge(clock_master);
+    wait for delay_between_transactions;
     go <= '1';
-    wait for go1_duration;
+    wait for clock_master_period;
     go <= '0';
-    wait for go2_delay;
-    go <= '1';
-    wait for go2_duration;
-    go <= '0';
-    wait;
+  end process;
+
+  -- Generates stimulus
+  process (spi_sclk, spi_csn)
+    variable transmitted_data_index : integer;
+    variable response_data_index : integer;
+  begin
+    transmitted_data_index := transmit_data_width - 1 - counter_transaction;
+    response_data_index := transaction_bits - 1 - counter_transaction;
+    if rising_edge(spi_csn) then
+      counter_transaction <= 0;
+      spi_sdi <= 'X';
+      report "Transaction concluded.\n";
+      response_data <= response_data + 1;
+    elsif falling_edge(spi_sclk) then
+      if response_data_index > receive_data_width then
+        spi_sdi <= 'X';
+      else
+        spi_sdi <= response_data(response_data_index);
+      end if;
+    elsif rising_edge(spi_sclk) then
+      if counter_transaction < transaction_bits then
+        counter_transaction <= counter_transaction + 1;
+      end if;
+      transmitted_data(transmitted_data_index) <= spi_sdo;
+    end if;
   end process;
 
   DUT : spi_master
     generic map (
       clock_divider => clock_divider,
-      transaction_bits => transaction_bits
+      transaction_bits => transaction_bits,
+      transmit_data_width => transmit_data_width,
+      receive_data_width => receive_data_width
     )
     port map (
       clock_master => clock_master,
       reset_n => reset_n,
+      transmit_data => transmit_data,
+      receive_data => receive_data,
       go => go,
+      done => done,
       spi_csn => spi_csn,
       spi_sclk => spi_sclk,
       spi_sdi => spi_sdi,
