@@ -22,6 +22,7 @@ component spi_master is
     transmit_data : in std_logic_vector(register_out_width - 1 downto 0);
     receive_data : out std_logic_vector(register_in_width - 1 downto 0);
     go : in std_logic;  -- spi transaction begins when this goes high
+    done : out std_logic; -- spi transaction concludes when this goes high
 
     -- spi interface
     spi_csn : out std_logic;

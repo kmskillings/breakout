@@ -23,6 +23,7 @@ entity spi_master is
     transmit_data : in std_logic_vector(register_out_width - 1 downto 0);
     receive_data : out std_logic_vector(register_in_width - 1 downto 0);
     go : in std_logic;  -- spi transaction begins when this goes high
+    done : out std_logic; -- spi transaction concludes when this goes high
 
     -- spi interface
     spi_csn : out std_logic;
@@ -168,6 +169,22 @@ begin
     end if;
   end process;
   spi_sclk <= not spi_sclk_n;
+
+  -- The transaction is done after the last bit has been shifted in. The done
+  -- line pulses on the same tick that spi_csn first goes high. To work at
+  -- maximum speed, the done signal can be looped back to serve as a go signal.
+  process(clock_master, reset_n)
+  begin
+    if reset_n = '0' then
+      done <= '0';
+    elsif rising_edge(clock_master) then
+      if spi_cs = '1' and counter_transaction = 0 then
+        done <= '1';
+      else
+        done <= '0';
+      end if;
+    end if;
+  end process;
   
   -- The data out register is loaded at the beginning of a transaction. Data is
   -- then shifted out on every falling edge of spi_sclk (while the spi is
