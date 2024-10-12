@@ -89,7 +89,7 @@ begin
     go <= '0';
   end process;
 
-  -- Increments response data for every transaction
+  -- Generates the response data for every transaction
   process (go)
     variable random_real : real;
     variable seed1 : positive;
@@ -103,13 +103,39 @@ begin
     end if;
   end process;
 
-  -- Checks for correct data at the end of each transaction
+  -- Checks for correct response data at the end of each transaction
   process (clock_master)
   begin
     if rising_edge(clock_master) then
       if done = '1' then
         assert std_logic_vector(response_data) = receive_data
           report "Incorrect data received."
+          severity error;
+      end if;
+    end if;
+  end process;
+
+  -- Generates the transmit data for every transaction
+  process (go)
+    variable random_real : real;
+    variable seed1 : positive;
+    variable seed2 : positive;
+  begin
+    if rising_edge(go) then
+      uniform(seed1, seed2, random_real);
+      transmit_data <= std_logic_vector(to_unsigned(integer(
+        random_real * real(2**transmit_data_width - 1)), transmit_data_width
+      ));
+    end if;
+  end process;
+
+  -- Check the transmit data at the end of every transaction
+  process (clock_master)
+  begin
+    if rising_edge(clock_master) then
+      if done = '1' then
+        assert transmitted_data = transmit_data
+          report "Incorrect data transmitted"
           severity error;
       end if;
     end if;
