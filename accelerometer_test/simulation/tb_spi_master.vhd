@@ -55,7 +55,7 @@ architecture tb of tb_spi_master is
 
   -- The "other side" of the SPI
   signal transmitted_data : std_logic_vector(transmit_data_width - 1 downto 0);
-  signal response_data : unsigned(receive_data_width - 1 downto 0) := to_unsigned(0, receive_data_width);
+  signal response_data : std_logic_vector(receive_data_width - 1 downto 0);
   signal counter_transaction : natural range 0 to transaction_bits;
 
 begin
@@ -89,6 +89,32 @@ begin
     go <= '0';
   end process;
 
+  -- Increments response data for every transaction
+  process (go)
+    variable random_real : real;
+    variable seed1 : positive;
+    variable seed2 : positive;
+  begin
+    if rising_edge(go) then
+      uniform(seed1, seed2, random_real);
+      response_data <= std_logic_vector(to_unsigned(integer(
+        random_real * real(2**receive_data_width - 1)), receive_data_width
+      ));
+    end if;
+  end process;
+
+  -- Checks for correct data at the end of each transaction
+  process (clock_master)
+  begin
+    if rising_edge(clock_master) then
+      if done = '1' then
+        assert std_logic_vector(response_data) = receive_data
+          report "Incorrect data received."
+          severity error;
+      end if;
+    end if;
+  end process;
+
   -- Generates stimulus
   process (spi_sclk, spi_csn)
     variable transmitted_data_index : integer;
@@ -96,14 +122,8 @@ begin
   begin
     transmitted_data_index := transmit_data_width - 1 - counter_transaction;
     response_data_index := transaction_bits - 1 - counter_transaction;
-    if rising_edge(spi_csn) then
+    if spi_csn = '1' then
       counter_transaction <= 0;
-      spi_sdi <= 'X';
-      report "Transaction concluded.\n";
-      assert std_logic_vector(response_data) = receive_data
-        report "Incorrect data received."
-        severity error;
-      response_data <= response_data + 1;
     elsif falling_edge(spi_sclk) then
       if response_data_index > receive_data_width then
         spi_sdi <= 'X';
