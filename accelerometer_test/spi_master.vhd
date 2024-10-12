@@ -171,14 +171,13 @@ begin
   spi_sclk <= not spi_sclk_n;
 
   -- The transaction is done after the last bit has been shifted in. The done
-  -- line pulses on the same tick that spi_csn first goes high. To work at
-  -- maximum speed, the done signal can be looped back to serve as a go signal.
+  -- line pulses on the first tick that the receive_data is ready to read.
   process(clock_master, reset_n)
   begin
     if reset_n = '0' then
       done <= '0';
     elsif rising_edge(clock_master) then
-      if spi_cs = '1' and counter_transaction = 0 then
+      if shift_in = '1' and counter_transaction = 1 then
         done <= '1';
       else
         done <= '0';
@@ -227,5 +226,6 @@ begin
       end if;
     end if;
   end process;
+  receive_data <= register_in;
 
 end architecture; -- rtl
