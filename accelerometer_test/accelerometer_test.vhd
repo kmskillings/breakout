@@ -92,7 +92,8 @@ begin
       ledr <= (others => '0');
     elsif rising_edge(clock_master) then
       if done = '1' then
-        ledr <= accelerometer_reading(9 downto 0);
+        ledr(7 downto 0) <= accelerometer_reading(15 downto 8);
+        ledr(9 downto 8) <= accelerometer_reading(1 downto 0);
       elsif key(1) = '0' then
         ledr <= (others => '1');
       end if;
