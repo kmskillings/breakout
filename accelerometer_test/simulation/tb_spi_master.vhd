@@ -35,9 +35,9 @@ architecture tb of tb_spi_master is
   -------------------- DUT settings --------------------
 
   constant clock_divider : positive := 6;
-  constant transaction_bits : natural := 8;
+  constant transaction_bits : natural := 24;
   constant transmit_data_width : natural := 8;
-  constant receive_data_width : natural := 8;
+  constant receive_data_width : natural := 16;
 
   -------------------- Testbench signals --------------------
 
@@ -151,7 +151,7 @@ begin
     if spi_csn = '1' then
       counter_transaction <= 0;
     elsif falling_edge(spi_sclk) then
-      if response_data_index > receive_data_width then
+      if response_data_index > receive_data_width - 1 then
         spi_sdi <= 'X';
       else
         spi_sdi <= response_data(response_data_index);
@@ -160,7 +160,9 @@ begin
       if counter_transaction < transaction_bits then
         counter_transaction <= counter_transaction + 1;
       end if;
-      transmitted_data(transmitted_data_index) <= spi_sdo;
+      if transmitted_data_index >= 0 then
+        transmitted_data(transmitted_data_index) <= spi_sdo;
+      end if;
     end if;
   end process;
 
