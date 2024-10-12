@@ -1,9 +1,14 @@
+**/.qsys_edit
+**.done
 **.rpt
-**.qpf
-**.qsf
+**.summary
+**.qws
+**.qdf
+**/db
+**/incremental_db
 **.mti
 **.mpf
 **.wlf
-simulation/work/
+**/work
 
 
