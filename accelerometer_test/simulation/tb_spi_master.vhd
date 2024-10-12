@@ -100,6 +100,9 @@ begin
       counter_transaction <= 0;
       spi_sdi <= 'X';
       report "Transaction concluded.\n";
+      assert std_logic_vector(response_data) = receive_data
+        report "Incorrect data received."
+        severity error;
       response_data <= response_data + 1;
     elsif falling_edge(spi_sclk) then
       if response_data_index > receive_data_width then
