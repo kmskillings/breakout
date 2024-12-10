@@ -1,0 +1,4 @@
+Dec 9 2024
+
+I strongly suspect this project is going to rapidly outgrow what can be
+reasonably simulated, but it's nice to pretend.
