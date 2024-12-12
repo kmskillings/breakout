@@ -11,8 +11,6 @@ library ieee ;
 
 package vga_common is
 
-  constant c_phase_name_length : natural := 16;
-
   type t_phase_id is (
     SYNC,
     FRONT,
@@ -22,10 +20,13 @@ package vga_common is
 
   subtype t_phase_duration is positive;
 
+  constant c_phase_name_length : natural := 16;
+  subtype t_phase_name is string(1 to c_phase_name_length);
+
   type t_phase is record
     id : t_phase_id;
     duration : t_phase_duration;
-    name : string(1 to c_phase_name_length);
+    name : t_phase_name;
   end record;
 
   type t_sequence is array (natural range <>) of t_phase;
