@@ -28,34 +28,34 @@ package vga_common is
     name : string(1 to c_vga_phase_name_length);
   end record;
 
-  type t_vga_phase_array is array (natural range <>) of t_vga_phase;
+  type t_vga_phase_sequence is array (natural range <>) of t_vga_phase;
 
-  -- Returns the longest phase in the given array.
-  function get_longest_phase(
-    phases : t_vga_phase_array
-  ) return t_vga_phase;
+  -- Returns the duration of the longest phase in a sequence.
+  function get_longest_duration(
+    sequence : t_vga_phase_sequence
+  ) return t_phase_duration;
   
 end package ;
 
 package body vga_common is
 
   function get_longest_phase(
-    phases : t_vga_phase_array
-  ) return t_vga_phase is
+    sequence : t_vga_phase_sequence
+  ) return t_phase_duration is
     
-    variable longest_phase : t_vga_phase := phases(0);
+    variable longest_phase : t_vga_phase := sequence(0);
     variable phase : t_vga_phase;
 
   begin
 
-    for i in phases'range loop
-      phase := phases(i);
+    for i in sequence'range loop
+      phase := sequence(i);
       if phase.duration > longest_phase.duration then
         longest_phase := phase;
       end if;
     end loop;
     
-    return longest_phase;
+    return longest_phase.duration;
 
   end get_longest_phase;
 
