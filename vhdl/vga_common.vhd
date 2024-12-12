@@ -13,10 +13,17 @@ package vga_common is
 
   constant c_vga_phase_name_length : natural := 16;
 
-  subtype t_phase_duration is natural;
+  type t_phase_id is (
+    SYNC,
+    FRONT,
+    ACTIVE,
+    BACK
+  );
+
+  subtype t_phase_duration is positive;
 
   type t_vga_phase is record
-    id : natural range 0 to 3;
+    id : t_phase_id;
     duration : t_phase_duration;
     name : string(1 to c_vga_phase_name_length);
   end record;
