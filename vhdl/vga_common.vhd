@@ -35,6 +35,11 @@ package vga_common is
   function get_longest_duration(
     sequence : t_sequence
   ) return t_phase_duration;
+
+  function get_next_phase(
+    sequence : t_sequence;
+    current_index : natural
+  ) return natural range 0 to 3;
   
 end package ;
 
