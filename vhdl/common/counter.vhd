@@ -46,6 +46,40 @@ end counter ;
 
 architecture rtl of counter is
 
+  signal terminal_count_int : natural range 0 to max_count ;
+
 begin
+
+  wrapping <=
+    '1' when enable = '1' and count = terminal_count_int else
+    '0';
+
+  REGISTER_TERMINAL_COUNT : process( clock, reset_n )
+  begin
+    if reset_n = '0' then
+      terminal_count_int <= 0;
+      -- Starting with a terminal count of 0 ensures that the terminal count
+      -- input will be registered next.
+    elsif rising_edge(clock) then
+      if wrapping = '1' then
+        terminal_count_int <= terminal_count
+      end if;
+    end if;
+  end process ; -- REGISTER_TERMINAL_COUNT
+
+  COUNT_UP : process( clock, reset_n )
+  begin
+    if reset_n = '0' then
+      count <= 0;
+    elsif rising_edge(clock) then
+      if enable = '1' then
+        if count = terminal_count_int then
+          count <= 0;
+        else
+          count <= count + 1;
+        end if;
+      end if;
+    end if;
+  end process ; -- COUNT_UP
 
 end architecture ;
