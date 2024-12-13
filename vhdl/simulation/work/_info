@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/18012/Documents/breakout/vhdl/simulation
 Ebreakout
-Z1 w1733809960
+Z1 w1733811570
 Z2 DPx4 ieee 9 math_real 0 22 Sk6CSihbPL<f[^Shm]=KX0
 Z3 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
 Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
@@ -19,30 +19,30 @@ Z6 8C:/Users/18012/Documents/breakout/vhdl/breakout.vhd
 Z7 FC:/Users/18012/Documents/breakout/vhdl/breakout.vhd
 l0
 L12
-VTKQ2z=016eRUckgkN`NMB3
+VPZGT9_4;3kE?8l3a?mcIG1
 !s100 UKJADI=;U^2387m49MzBf2
 Z8 OV;C;10.5b;63
-32
-Z9 !s110 1733811219
+33
+Z9 !s110 1734067084
 !i10b 1
-Z10 !s108 1733811219.000000
-Z11 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/breakout.vhd|
+Z10 !s108 1734067084.000000
+Z11 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/breakout.vhd|
 Z12 !s107 C:/Users/18012/Documents/breakout/vhdl/breakout.vhd|
 !i113 1
-Z13 o-work work -2002 -explicit
+Z13 o-work work -2008 -explicit
 Z14 tExplicit 1 CvgOpt 0
 Artl
 R2
 R3
 R4
 R5
-Z15 DEx4 work 8 breakout 0 22 TKQ2z=016eRUckgkN`NMB3
+DEx4 work 8 breakout 0 22 PZGT9_4;3kE?8l3a?mcIG1
 l52
 L48
-Z16 VWBDS>B17a2fJ[0X[NG?KD0
-Z17 !s100 KGSl>TRckMSSl<I4Ljl;;0
+V;@Xn4YkZR]lTe;3;_QPe[0
+!s100 KGSl>TRckMSSl<I4Ljl;;0
 R8
-32
+33
 R9
 !i10b 1
 R10
@@ -51,3 +51,154 @@ R12
 !i113 1
 R13
 R14
+Pcommon
+R3
+R4
+R5
+w1734067492
+R0
+8C:/Users/18012/Documents/breakout/vhdl/common/common.vhd
+FC:/Users/18012/Documents/breakout/vhdl/common/common.vhd
+l0
+L5
+Vz;CgQQPl?^S_SSaAJKFC00
+!s100 R86n2JUYL7ezRK5E27ffZ2
+R8
+32
+!s110 1734067573
+!i10b 1
+!s108 1734067573.000000
+!s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/common/common.vhd|
+!s107 C:/Users/18012/Documents/breakout/vhdl/common/common.vhd|
+!i113 1
+Z15 o-work work -2002 -explicit
+R14
+Ecounter
+Z16 w1734067111
+R3
+R4
+R5
+R0
+Z17 8C:/Users/18012/Documents/breakout/vhdl/common/counter.vhd
+Z18 FC:/Users/18012/Documents/breakout/vhdl/common/counter.vhd
+l0
+L14
+VJ`f^U_KWF;d:9=FOST8`43
+!s100 C>JAO8NN^hgog2b:W`eUX2
+R8
+33
+Z19 !s110 1734067120
+!i10b 1
+Z20 !s108 1734067120.000000
+Z21 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/common/counter.vhd|
+Z22 !s107 C:/Users/18012/Documents/breakout/vhdl/common/counter.vhd|
+!i113 1
+R13
+R14
+Artl
+R3
+R4
+R5
+DEx4 work 7 counter 0 22 J`f^U_KWF;d:9=FOST8`43
+l51
+L47
+Vk^W:[K89Nj_Kn@QjJg58U3
+!s100 F0TD<I7QR9BdVIUgAelbd3
+R8
+33
+R19
+!i10b 1
+R20
+R21
+R22
+!i113 1
+R13
+R14
+Etb_counter
+Z23 w1734068790
+Z24 DPx4 work 6 common 0 22 z;CgQQPl?^S_SSaAJKFC00
+R2
+R3
+R4
+R5
+R0
+Z25 8C:/Users/18012/Documents/breakout/vhdl/simulation/tb_counter.vhd
+Z26 FC:/Users/18012/Documents/breakout/vhdl/simulation/tb_counter.vhd
+l0
+L9
+VY3<IUIHPz1FJVfBTo<JKl1
+!s100 U<ZKbch5Xk`UGnz82=Ha11
+R8
+32
+Z27 !s110 1734068799
+!i10b 1
+Z28 !s108 1734068799.000000
+Z29 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/simulation/tb_counter.vhd|
+Z30 !s107 C:/Users/18012/Documents/breakout/vhdl/simulation/tb_counter.vhd|
+!i113 1
+R15
+R14
+Aarch
+R24
+R2
+R3
+R4
+R5
+DEx4 work 10 tb_counter 0 22 Y3<IUIHPz1FJVfBTo<JKl1
+l36
+L12
+V1mIY4ES7FmbOcNVhYO[el1
+!s100 SOU?CXJe6>6>naF:3RkCU1
+R8
+32
+R27
+!i10b 1
+R28
+R29
+R30
+!i113 1
+R15
+R14
+Pvga_common
+R3
+R4
+R5
+w1733980562
+R0
+Z31 8C:/Users/18012/Documents/breakout/vhdl/vga_common.vhd
+Z32 FC:/Users/18012/Documents/breakout/vhdl/vga_common.vhd
+l0
+L12
+VgSg<3E14d^ecA82RngXNg3
+!s100 2U1]S<:714gD6Y[g^:@?51
+R8
+32
+b1
+!s110 1733980569
+!i10b 1
+!s108 1733980568.000000
+Z33 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/18012/Documents/breakout/vhdl/vga_common.vhd|
+Z34 !s107 C:/Users/18012/Documents/breakout/vhdl/vga_common.vhd|
+!i113 1
+R15
+R14
+Bbody
+DPx4 work 10 vga_common 0 22 >i6IJQARE2`A7PD2T:KXW1
+R3
+R4
+R5
+l0
+L41
+VK8OQf;iW_2c@_@T=IY;a]2
+!s100 B3CAnYPcbhz^TJ^OJ469[3
+R8
+32
+!s110 1733977593
+!i10b 1
+!s108 1733977593.000000
+R33
+R34
+!i113 1
+R15
+R14
+w1733977585
