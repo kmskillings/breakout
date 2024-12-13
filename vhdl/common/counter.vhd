@@ -16,7 +16,7 @@ entity counter is
   generic (
 
   -- The maximum count the counter will have under any circumstance.
-  max_count : natural ;
+  max_count : natural 
 
   ) ;
 
@@ -62,7 +62,7 @@ begin
       -- input will be registered next.
     elsif rising_edge(clock) then
       if wrapping = '1' then
-        terminal_count_int <= terminal_count
+        terminal_count_int <= terminal_count;
       end if;
     end if;
   end process ; -- REGISTER_TERMINAL_COUNT
