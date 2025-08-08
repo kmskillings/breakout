@@ -77,3 +77,14 @@ Only the DE10-Lite includes an accelerometer, which I would like to use to
 control the paddle. As a result, this project will target the 10DE-Lite board.
 This also means that this project will use Intel's Quartus Prime design
 software.
+
+### Tooling
+
+The next step is to get my tooling set up.
+
+Because I am using the DE10-Lite board, I'm locked into using Intel's Quartus
+software suite. I downloaded and installed the latest version, which went
+surprisingly smoothly.
+
+I want to validate my tooling, to make sure I have everything I need and I know
+how to use it. To acheive this, I will do a simple "blinky" project. Everything for this project will be located in a separate test/blinky branch of the repo.
