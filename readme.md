@@ -14,3 +14,5 @@ game Breakout, targetting the DE10-Lite development board.
 After I completed this project, I continued to gain experience with FPGA. This
 project will apply the lessons I've learned since 2023 to create a cleaner,
 more feature-rich version of the game.
+
+This project's progress is tracked in journal.md.
