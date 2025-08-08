@@ -38,6 +38,26 @@ working.
 The next step was to create a Github repo for this project and connect it to my new Linux system. It had been some time since I had used git or Github in any
 serious capacity, but I followed the instructions and got everything working.
 
+### Requirements
+
+The requirements for the original final project can be found in 
+original_requirements.pdf. However, I made a few notable changes to the 
+requirements for this project.
+
+- VHDL is not a requirement. I will consider a variety of HDLs for use in this
+project.
+- The bricks, ball, and paddle will not be simple blocks. Instead, they will
+be textured. The ball will also be "round" and have pixel-perfect collision with
+the bricks and paddle.
+- The on-board accelerometer will be used for moving the paddle.
+- The background may have a color other than black, or even a scrolling
+background image.
+- The number of balls remaining and the player's score shall be represented
+on-screen.
+
+These requirements represent a significant increase in difficulty, relative to
+the original requirements.
+
 ### Target
 
 I own two FPGA development boards:
