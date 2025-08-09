@@ -87,4 +87,17 @@ software suite. I downloaded and installed the latest version, which went
 surprisingly smoothly.
 
 I want to validate my tooling, to make sure I have everything I need and I know
-how to use it. To acheive this, I will do a simple "blinky" project. Everything for this project will be located in a separate test/blinky branch of the repo.
+how to use it. To acheive this, I will do a simple "blinky" project. Everything
+for this project will be located in a separate test/blinky branch of the repo.
+
+First, I will create the VHDL code for the blinky project. I will use VHDL
+becuase it is the HDL I am most familiar with, and the emphasis of this first
+test is not learning a new HDL.
+
+### Blinky
+
+The code is very simple. The design consists of a single file that counts clock
+cycles. When the clock reaches a certain value, the LED is turned on. When the
+clock reaches another value, the LED is turned off. The values are tuned to
+blink the LED at a rate of 500 mHz and a duty cycle of 50% (On for one second,
+off for one second).
