@@ -101,3 +101,20 @@ cycles. When the clock reaches a certain value, the LED is turned on. When the
 clock reaches another value, the LED is turned off. The values are tuned to
 blink the LED at a rate of 500 mHz and a duty cycle of 50% (On for one second,
 off for one second).
+
+### Licensing, Questa, and Compilation
+
+After I drafted the code for Blinky, I had to compile it. I am most accustomed
+to Modelsim, but it appears that Modelsim has been replaced with Questa.
+
+I downloaded and ran the Quartus Prime 24.1 installed, which also installed
+Questa. When I tried running Questa from the command line (via the vsim
+executable), it informed me that I would need a license.
+
+After going through the whole rigamarole to get a free Questa license, I
+downloaded it, added in to my ENV, and was able to launch Questa in GUI mode.
+It looks identical to the Modelsim I remember. I used the GUI to compile my
+Blinky code and correct a few syntax errors.
+
+Next, I want to use the command line to compile and simulate my designs, but it
+looks like this will have to be a topic for another time.
