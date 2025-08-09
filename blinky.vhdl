@@ -3,6 +3,10 @@
 -- Blinks an LED at a rate of 500 mHz and a duty cycle of 50%
 -- (On for one second, off for one second).
 
+library ieee;
+use ieee.std_logic_1164.std_logic;
+use ieee.std_logic_1164.rising_edge;
+
 entity blinky is
 	port (
 	clock	:	in	std_logic; -- 50 MHz input clock
@@ -34,7 +38,7 @@ begin
 			count <= count + 1;
 		end if;
 	end if;
-end process
+end process;
 	
 -- Turn the LED on and off.
 process (clock, arst_n)
