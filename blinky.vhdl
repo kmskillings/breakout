@@ -10,7 +10,7 @@ use ieee.std_logic_1164.rising_edge;
 entity blinky is
 	port (
 	clock	:	in	std_logic; -- 50 MHz input clock
-	arst_n	:	in	std_logic; -- Asynchronous active-low reset
+	button	:	in	std_logic; -- Reset button
 	led	:	out	std_logic
 	);
 end blinky;
@@ -22,9 +22,29 @@ architecture rtl of blinky is
 	constant off_count : natural := period_cycles - 1;
 	constant max_count : natural := period_cycles - 1;
 
+	signal reset_synchronizer_0 : std_logic;
+	signal reset_synchronizer_1 : std_logic;
+	signal arst_n : std_logic;
 	signal count : natural range 0 to max_count;
 
 begin
+
+-- Create reset signal from button.
+process (clock, button)
+begin
+	-- Asynchronous assert
+	if button = '1' then
+		reset_synchronizer_0 <= '0';
+		reset_synchronizer_1 <= '0';
+	-- Synchronous de-assert, passed through two d flip-flops.
+	elsif rising_edge(clock) then
+		reset_synchronizer_0 <= '1';
+		reset_synchronizer_1 <= reset_synchronizer_0;
+	end if;
+end process;
+rst <= 	'1' when reset_synchronizer_1 = '1'
+	'0' when reset_synchronizer_1 = '0'
+	'0' when reset_synchronizer_1 = others;
 
 -- Increment the counter every tick.
 process (clock, arst_n)

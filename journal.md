@@ -118,3 +118,11 @@ Blinky code and correct a few syntax errors.
 
 Next, I want to use the command line to compile and simulate my designs, but it
 looks like this will have to be a topic for another time.
+
+## August 9, 2025
+
+### Asynchronous Reset with Synchrounous De-Assert
+
+After a bit of time to think, I realized I should update my Blinky code to have
+asynchronous reset with synchronous de-assert. I made the appropriate change to
+the code.
