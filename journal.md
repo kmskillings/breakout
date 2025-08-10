@@ -125,4 +125,5 @@ looks like this will have to be a topic for another time.
 
 After a bit of time to think, I realized I should update my Blinky code to have
 asynchronous reset with synchronous de-assert. I made the appropriate change to
-the code.
+the code. I compiled the code using vcom from the command line and corrected
+the syntax errors.

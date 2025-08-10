@@ -42,9 +42,10 @@ begin
 		reset_synchronizer_1 <= reset_synchronizer_0;
 	end if;
 end process;
-rst <= 	'1' when reset_synchronizer_1 = '1'
-	'0' when reset_synchronizer_1 = '0'
-	'0' when reset_synchronizer_1 = others;
+arst_n <= 
+	'1' when reset_synchronizer_1 = '1' else
+	'0' when reset_synchronizer_1 = '0' else
+	'0';
 
 -- Increment the counter every tick.
 process (clock, arst_n)
