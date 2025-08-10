@@ -127,3 +127,34 @@ After a bit of time to think, I realized I should update my Blinky code to have
 asynchronous reset with synchronous de-assert. I made the appropriate change to
 the code. I compiled the code using vcom from the command line and corrected
 the syntax errors.
+
+### Self-Checking Testbench for Blinky
+
+Next, I need to write a testbench for my blinky program. Ideally, the testbench
+will be completely self-checking, so I can (in the ideal case) test the module
+completely from the command line.
+
+The testbench will start by holding the DUT in reset for a certain number of
+clock ticks, to make sure everything is correctly initialized. It will then
+release the reset and provide the DUT with a clock signal. The testbench will
+include the following checks:
+
+- The period of the blinker is 2 seconds, as measured between one rising edge
+of the output and the next rising edge of the output.
+- The duty cycle of the blinker is 50%, as measured by the output being high
+50% of the time and low the other 50%.
+- Asserting the reset causes the output to immediately go low. The above tests
+are then repeated.
+
+I drew up an outline of the testbench and immediately noticed a problem: The
+testbench takes way too long to run. I probably should have predicted this.
+The issue is having to simulate all hundred million ticks per period. I'll
+have to find a way to reduce the number of ticks that have to be simulated.
+
+The obvious way to do this would be to pass in generics that determine the
+period and clock frequency of the blinker. Then, in the testbench, I could pass
+in a much shorter blinker period (or lower flock frequency). Then, in the
+"real" version, I would either wrap blinky.vhdl in some kind of top-level
+module to passin the "real" values, or set the defaults to the real values.
+
+Overall, I like the second approach better.
