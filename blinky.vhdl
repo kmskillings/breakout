@@ -8,6 +8,11 @@ use ieee.std_logic_1164.std_logic;
 use ieee.std_logic_1164.rising_edge;
 
 entity blinky is
+	generic (
+	clock_frequency : natural := 50_000_000;
+	blink_period : time := 2 sec;
+	duty_cycle : real := 0.5
+	);
 	port (
 	clock	:	in	std_logic; -- 50 MHz input clock
 	button	:	in	std_logic; -- Reset button
@@ -17,8 +22,10 @@ end blinky;
 
 architecture rtl of blinky is
 
-	constant period_cycles : natural := 100_000_000;
-	constant on_count : natural := period_cycles / 2 - 1;
+	constant clock_period : time := 1 sec / clock_frequency;
+	constant period_cycles : natural := blink_period / clock_period;
+	constant on_count : natural 
+		:= integer(duty_cycle * real(period_cycles)) - 1;
 	constant off_count : natural := period_cycles - 1;
 	constant max_count : natural := period_cycles - 1;
 

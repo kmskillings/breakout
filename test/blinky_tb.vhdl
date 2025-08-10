@@ -19,6 +19,8 @@ architecture tb of blinky_tb is
 
 	constant clock_frequency : natural := 50_000_000;
 	constant clock_period : time := 1 sec / clock_frequency;
+	constant blink_period : time := 10 us;
+	constant duty_cycle : real := 0.5;
 
 	constant init_reset_cycles : natural := 3;
 	constant init_reset_time : time := clock_period * init_reset_cycles;
@@ -65,6 +67,11 @@ end process;
 
 -- DUT instance
 DUT : entity work.blinky(rtl)
+generic map (
+	clock_frequency => clock_frequency,
+	blink_period => blink_period,
+	duty_cycle => duty_cycle
+)
 port map (
 	clock => clock,
 	button => button,
