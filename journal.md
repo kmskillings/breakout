@@ -158,3 +158,32 @@ in a much shorter blinker period (or lower flock frequency). Then, in the
 module to passin the "real" values, or set the defaults to the real values.
 
 Overall, I like the second approach better.
+
+## August 10, 2025
+
+### Finishing Testbench
+
+I decided that the overall structure of the testbench will be to have a single
+process that conducts all the tests. Each test, in addition to any interface
+signals it requires, also outputs two signals:
+
+- A "Complete" signal.
+- A "Passed" signal.
+
+The "Complete" signal is set to 1 immediately after the test finishes its 
+tasks. The "Passed" signal is either set or reset depending on the results of
+the test.
+
+Then, a separate process waits until every test is complete, then checks their
+passed signals. If all the tests passed, the testbench reports that the design
+is OK and finishes. Otherwise, the testbench reports a bad design and finishes.
+
+I hope that this overall testbench structure will allow a variety of well-
+organized, flexible testbenches throughout this project.
+
+### Makefile
+
+After finishing up the testbench and verifying it works in the Questa GUI,
+I create a Makefile to automate the compilation and simulation of my design.
+It is extremely basic, but still helps. I expect that my Makefiles will become
+more sophisticated as the project grows.
