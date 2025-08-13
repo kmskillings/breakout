@@ -208,3 +208,37 @@ Next is the .sdc, which contains the timing constraints. Both the button input
 and output LED are unconstrained, so the only thing that needs to go in the
 .sdc is the clock.
 
+The next step was to make sure I could fully synthesize, place and route, and
+assemble the design using the command line. I referenced the "Flow Log" of a
+test project and added them to the Makefile.
+
+### Programming the Device
+
+The final step was to program my DE10-Lite. This was a massive headache.
+
+When I plugged in my FPGA, it showed up in the programming menu as a USB
+Blaster, just as it was supposed to. But I couldn't do anything with it. After
+reading some sketchy-ass forums online, I determined that my problem was that
+the JTAG programmer daemon needed root access, which I needed to add via a udev
+rule. I'm sure I'll learn someday what a udev rule is, but in this case I had
+no idea. But I copied and pasted a file from the Internet that seemed to work
+fine.
+
+
+`SUBSYSTEM=="usb", 
+
+ENV{DEVTYPE}=="usb_device", 
+
+ATTR{idVendor}=="09fb", 
+
+ATTR{idProduct}=="6001", 
+
+MODE="0666", 
+
+NAME="bus/usb/$env{BUSNUM}/$env{DEVNUM}", 
+
+RUN+="/bin/chmod 0666 %c" `
+
+Finally, I studied the options for the quartus_pgm command and added two
+versions to the Makefile: One for programming just the FPGA using a .sof, and
+one for programming the configuration EEPROM using a .pof.

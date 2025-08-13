@@ -12,3 +12,17 @@ compile_test: ./test/blinky_tb.vhdl
 .PHONY: simulate
 simulate:
 	vsim -c -do "run -all" work.blinky_tb
+
+./build/blinky.sof ./build/blinky.pof: blinky.vhdl blinky.qsf blinky.sdc
+	quartus_map blinky
+	quartus_fit blinky
+	quartus_asm blinky
+	quartus_sta blinky
+
+.PHONY: burn_temp
+burn_temp: ./build/blinky.sof
+	quartus_pgm -c "USB-Blaster [1-9]" -m "JTAG" -o "p;./build/blinky.sof"
+
+.PHONY: burn_perm
+burn_perm: ./build/blinky.sof
+	quartus_pgm -c "USB-Blaster [1-9]" -m "JTAG" -o "bpv;./build/blinky.pof"
