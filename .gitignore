@@ -2,3 +2,7 @@
 work/*
 transcript
 *.wlf
+*.qpf
+build/*
+db/*
+incremental_db/*
