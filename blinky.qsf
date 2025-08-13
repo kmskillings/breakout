@@ -1,0 +1,30 @@
+# Created by hand for this project, despite Intel's recommendations.
+
+# Target settings
+set_global_assignment -name FAMILY "MAX 10"
+set_global_assignment -name 10M50DAF48C7G
+
+# Design source files
+set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
+set_global_assignment -name VHDL_FILE blinky.vhdl
+set_global_assignment -name TOP_LEVEL_ENTITY blinky
+
+#Compilation process
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY ./build/
+
+# I/O
+
+## Clock
+set_location_assignment -name PIN_P11 -to clock
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clock
+
+## Button
+set_location_assignment -name PIN_B8 -to button
+set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to button
+
+## LED
+set_location_assignment -name PIN_A8 -to led
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to led
+set_instance_assignemnt -name CURRENT_STRENGTH_NEW 8MA -to led
+set_instance_assignment -name SLEW_RATE 2 -to led
+

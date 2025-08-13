@@ -187,3 +187,19 @@ After finishing up the testbench and verifying it works in the Questa GUI,
 I create a Makefile to automate the compilation and simulation of my design.
 It is extremely basic, but still helps. I expect that my Makefiles will become
 more sophisticated as the project grows.
+
+## August 12, 2025
+
+### Project Setup
+
+The next step is to set up a Quartus project, will all the associated settings
+and whatnot. Ideally, I'd like to keep my usage of the Quartus GUI to a
+minimum and create the files manually, then run the flow steps from the command
+line or a Makefile. I know this isn't super practical, but I want to understand
+Quartus, rather than just memorizing the magic combination of button presses,
+and going command-line-only seems like a good way to do that.
+
+I couldn't find very good documentation on the setup of the QSF file and other
+topics, so I will heavily reference a "test project" I made.
+
+First comes the .qsf, which contains (most of?) the project settings.
