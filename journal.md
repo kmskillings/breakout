@@ -203,3 +203,8 @@ I couldn't find very good documentation on the setup of the QSF file and other
 topics, so I will heavily reference a "test project" I made.
 
 First comes the .qsf, which contains (most of?) the project settings.
+
+Next is the .sdc, which contains the timing constraints. Both the button input
+and output LED are unconstrained, so the only thing that needs to go in the
+.sdc is the clock.
+
