@@ -242,3 +242,10 @@ RUN+="/bin/chmod 0666 %c" `
 Finally, I studied the options for the quartus_pgm command and added two
 versions to the Makefile: One for programming just the FPGA using a .sof, and
 one for programming the configuration EEPROM using a .pof.
+
+### Final Blinky project
+
+After programming the FPGA, everything worked correctly, except that the logic
+sense of the reset button was inverted. After fixing this in the code,
+Blinky was complete, and my toolchain was validated and ready to begin the
+actual project!

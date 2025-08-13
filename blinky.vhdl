@@ -39,7 +39,7 @@ begin
 process (clock, button)
 begin
 	-- Asynchronous assert
-	if button = '1' then
+	if button = '0' then
 		reset_synchronizer_0 <= '0';
 		reset_synchronizer_1 <= '0';
 	-- Synchronous de-assert, passed through two d flip-flops.
