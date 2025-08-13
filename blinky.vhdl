@@ -4,8 +4,7 @@
 -- (On for one second, off for one second).
 
 library ieee;
-use ieee.std_logic_1164.std_logic;
-use ieee.std_logic_1164.rising_edge;
+use ieee.std_logic_1164.all;
 
 entity blinky is
 	generic (
