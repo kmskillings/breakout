@@ -264,3 +264,9 @@ to just bite the bullet and reinstall Cinnamon.
 After reinstalling, everything seems to be working correctly. Here's hoping
 that it will be clear sailing from here.
 
+### Planning
+
+The next step in this project is to document my overall plan for the project,
+and start to flesh out the details of the blocks and interfaces. The details
+will be recorded in the file documentation.md.
+
