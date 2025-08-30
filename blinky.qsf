@@ -11,6 +11,7 @@ set_global_assignment -name TOP_LEVEL_ENTITY blinky
 
 #Compilation process
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY ./build/
+set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
 
 # I/O
 
