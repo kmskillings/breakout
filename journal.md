@@ -249,3 +249,18 @@ After programming the FPGA, everything worked correctly, except that the logic
 sense of the reset button was inverted. After fixing this in the code,
 Blinky was complete, and my toolchain was validated and ready to begin the
 actual project!
+
+## August 30, 2025
+
+### More Linux Troubles
+
+My project stalled out since I started having trouble with my Linux install.
+For some reason, it looks like the udev rule for the USB blaster was
+iterfering with Cinnamon, and whenever I started my computer, after logging
+in I only got a black screen and a cursor. Trying to diagnose the problem by
+looking through journalctl and whatnot yielded no leads. Eventually, I decided
+to just bite the bullet and reinstall Cinnamon.
+
+After reinstalling, everything seems to be working correctly. Here's hoping
+that it will be clear sailing from here.
+
