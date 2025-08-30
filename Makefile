@@ -21,8 +21,8 @@ simulate:
 
 .PHONY: burn_temp
 burn_temp: ./build/blinky.sof
-	quartus_pgm -c "USB-Blaster [1-9]" -m "JTAG" -o "p;./build/blinky.sof"
+	quartus_pgm -c "USB-Blaster [1-1]" -m "JTAG" -o "p;./build/blinky.sof"
 
 .PHONY: burn_perm
 burn_perm: ./build/blinky.sof
-	quartus_pgm -c "USB-Blaster [1-9]" -m "JTAG" -o "bpv;./build/blinky.pof"
+	quartus_pgm -c "USB-Blaster [1-1]" -m "JTAG" -o "bpv;./build/blinky.pof"
