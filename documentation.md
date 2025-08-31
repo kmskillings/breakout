@@ -186,10 +186,6 @@ reads the memory as necessary to draw bricks on the screen. The
 game_state_ready signal is only raised if the Game Controller has made all
 necessary writes to the memory.
 
-Engineer's note: The way the valid and ack signals consider the memory is not
-ideal. It could significantly slow the interfacing between the two halves.
-We'll see how it goes.
-
 The VGA Controller presents information about any collisions that occur between
 the ball and the screen walls, bricks, or paddle. This information is presented
 via a FIFO. Each element in the FIFO represents a single collision that was
@@ -213,6 +209,11 @@ collision_ready signal, whereupon the Game Controller shifts in the collision
 data and lowers the collision_next signal. The VGA controller then lowers the
 collision_ready signal, at which point another collision may be read. All
 signals crossing the clock domain pass through synchronizer chains.
+
+The VGA Controller only raises the game_state_ack signal once it has placed all
+collisions into the FIFO. The Game Controller only raises the game_state_ready
+signal once it has considered (and therefore read) all collisions from the
+FIFO.
 
 ## VGA Controller
 
