@@ -215,6 +215,27 @@ collisions into the FIFO. The Game Controller only raises the game_state_ready
 signal once it has considered (and therefore read) all collisions from the
 FIFO.
 
+#### Game - Sound
+
+The Game Controller issues commands to the Sound Controller when certain events
+occur. The Sound Controller then produces square waveforms which drive a piezo-
+electric speaker to produce gameplay sounds.
+
+The interface between the Game Controller and the Sound Controller consists of
+a series of one-bit signals. Each signal corresponds to one sound that the
+Sound Controller can play. Additionall, a "sound_ready" signal indicates that
+the sounds are ready to be played. Because the Sound Controller and Game
+Controller are in the same clock domain, there is no need for synchronizer
+chains. Additionally, the Sound Controller is required to respond immediately
+to a high level on the sound_ready signal, so there is no need for an
+acknowledge signal.
+
+When the sound_ready signal goes high, the Sound Controller determines the
+highest-priority sound from among the sounds whose signals are high. The Sound
+Controller then cancels any already-playing sounds and begins playing that
+sound. If no sound signals are high, the currently-playing sound, if any, 
+continues playing.
+
 ## VGA Controller
 
 ### Requirements
