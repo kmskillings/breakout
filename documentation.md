@@ -17,10 +17,116 @@ Phillips's original requirements can be found in original_requirements.pdf.
 
 #### Target
 
+- 1.1 The design shall target the DE10-Lite FPGA board.
+- 1.1.1 The design code shall be synthesizeable for the 10M50DAF484C7G FPGA.
+- 1.1.2 The design shall make use only of interfaces and peripherals available
+on the DE10-Lite FPGA board.
+
+Requirement 1.1.1 is verified by successfully synthesizing and programming the
+design onto a DE10-Lite board.
+
+Requirement 1.1.2 is verified by inspection of the VHDL code.
+
+Requirement 1.1 is verified when both requirements of 1.1.1 and 1.1.2 are both
+successfully verified.
+
 #### Interface
+
+- 2.1 The VHDL design shall present the following interfaces to on-board
+devices.
+    - A a digital color signal, consisting of 3 channels, each 4 bits wide, to
+    the onboard VGA DAC.
+    - VSYNC and HSYNC signals, each one bit wide, to the VGA connector.
+    - A SOUND signal, one bit wide, to a general-use I/O pin.
+    - A DROPBALL signal, one bit wide, to an onboard user button.
+    - A RESET signal, one bit wide, to an onboard user button.
+    - An interface to the onboard ADXL345 accelerometer, consisting of the
+following signals:
+        - SCLK, SPI clock (FPGA out, ADXL in)
+        - SDI, input SPI data to the ADXL (FPGA out, ADXL in)
+        - SDO, output SPI data from the ADXL (FPGA in, ADXL out)
+        - CSn, active-low SPI slave select (FPGA out, ADXL in)
+        - INT1 and INT2, interrupt flag pins whose behavior is configured by
+the ADXL control registers (FPGA in, ADXL out)
 
 #### Functional
 
+- 3.1 The design shall produce a VGA video signal on its VGA connector with the
+following timing characteristics.
+    - Vertical timing
+        - VSYNC: 2 lines
+        - Back porch: 33 lines
+        - Visible area: 480 lines
+        - Front porch: 10 lines
+    - Horizontal timing
+        - VSYNC: 96 pixels
+        - Back porch: 48 pixels
+        - Visible area: 640 pixels
+        - Front porch: 16 pixels
+    - Framerate: about 60 Hz
+
+- 3.2 The image displayed by the VGA video signal shall consist of the
+elements.
+    - The entire upper half of the screen shall be divided into cells 16 pixels
+wide and 8 pixels high. Every other row shall be aligned to the left side of
+screen, while each other row shall be offset by half a cell-width, so the first
+and last cells in such a row are "cut off" to only eight pixels wide. In each
+cell shall be drawn either a brick or a blank space, depending on the game
+state.
+    - Zero or one balls, each ten pixels tall and ten pixels high, shall appear
+on the screen at a location depending on the game state. The ball shall be
+capable of appearing at any wholly on-screen location. The ball may be either
+a solid block or other shape, as long as the shape is wholly within the ten-by-
+ten bounding box. The quantity of balls appearing shall depend on the game
+state.
+    - One paddle, 40 pixels wide and ten pixels high, shall appear at the
+bottom of the screen at a horizontal position depending on the game state. The
+paddle shall be capable of appearing at any wholly on-screen horizontal
+location.
+    - Any areas of the screen on which no brick, ball, or paddle appears shall
+be uniformly filled with a color contrasting the bricks, ball, and paddle.
+
+- 3.3 The game state shall evolve over time according to the following
+rules.
+    - When the design is reset (either from startup or the RESET button being
+pressed), all bricks shall appear, and no ball shall appear.
+    - The position of the paddle shall be determined by the roll angle of the
+DE10-LITE board, as measured by the onboard accelerometer.
+    - When the DROPBALL button is pressed and no ball appears on the screen, 
+a ball shall appear on the screen at an unpredictable position and move
+directly down at a fixed speed.
+    - When the DROPBALL button is pressed and a ball is already present on the
+screen, there shall be no effect.
+    - When a ball contacts the bottom edge of the screen, the ball shall
+disappear. Once three balls have contacted the bottom of the screen since the
+system has been reset, the DROPBALL button shall cease to have any effect until
+the device is reset.
+    - Whenever the ball contacts the left or right edges of the screen, the
+ball's horizontal velocity shall invert. The ball's horizontal speed shall
+remain the same. The ball's vertical velocity shall also remain the same.
+    - Whenever the ball contacts the top edge of the screen, the ball's
+vertical velocity shall invert. The ball's vertical speed shal remain the
+same. The ball's horizontal velocity shall also remain the same.
+    - Whenever the ball contacts upper surface of the paddle, the ball's
+vertical velocity shall reverse. The ball's vertical speed shall remain the
+same. The ball's horizontal velocity shall change depending on where on the
+paddle the ball contacted. If the ball contacted the paddle closer to paddle's
+edge, the ball's horizontal velocity shall be greater in that direction.
+    - Whenever the ball contacts any surface of a brick, that brick shall
+disappear. The ball's vertical and horizontal velocity shall change is such a
+manner as to model the ball "bouncing" off the brick.
+
+- 3.3 The device shall produce sounds whenever any of the following events
+occur.
+    - The ball contacts the left, right, or upper edge of the screen.
+    - The ball contacts the upper surface of the paddle.
+    - The ball contacts the lower edge of the screen.
+    - The ball contacts a brick.
+    - A new ball appears on the screen.
+Each sound shall consist of a series of one or more square-wave notes at
+different, arbitrary frequencies. No two sounds shall be played simultaneously.
+Each sound shall be recongizeable and distinct.
+ 
 ### Implementation
 
 ## VGA Controller
