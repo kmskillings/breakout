@@ -129,6 +129,71 @@ Each sound shall be recongizeable and distinct.
  
 ### Implementation
 
+The design consists of the following four primary sections.
+
+- The "VGA Controller" is responsible for producing the VGA signal output to an
+attached (off-board) VGA display. The VGA controller produces the VGA signal to
+reflect the game state, as provided by the Game Controller.
+
+- The "Game Controller" is responsible for calculating and updating the game
+state. The Game Controller considers input recieved from the user buttons and
+ADXL Controller when updating the game state. The Game Controller provides game
+state information to the VGA controller. The Game Controller also issues
+commands to the Sound Controller when certain events occur.
+
+- The "ADXL Controller" is responsible for interfacing with the onboard ADXL345
+accelerometer. The ADXL Controller configures the control registers of the ADXL
+and regularly queries the output data. The ADXL Controller then performs any
+necessary processing and presents the final angle data to the Game Controller.
+
+- The "Sound Controller" is responsible for producing sound waveforms, which
+are then played back via a piezo-electric speaker. The Sound Controller is
+issued commands by the Game Controller.
+
+The four primary sections communicate via the following interfaces.
+
+#### Game - VGA
+
+The Game Controller presents the VGA Controller with the game state via the
+following signals.
+
+- ball_active: A true/false signal representing whether a ball should appear on
+the screen.
+
+- ball_position: A set of coordinates representing the on-screen position of
+the ball.
+
+- paddle_position: The on-screen horizontal position of the paddle (The
+vertical position of the paddle is fixed).
+
+Because the VGA controller and Game Controller run at different clock speeds,
+these signals cannot simply be passed between the two clock domains. The
+signals are accompanied by a "game_state_valid" signal, which goes high to
+signal that all game state signals may be shifted into the VGA controller. All
+these signals are synchronized through a two-deep synchronizer chain. Once the
+VGA Controller shifts in the game state signals, it raises a "game_state_ack"
+signal, which signals to the Game Controller that the game state signals are
+no longer required. The Game Controller then lowers the game_state_valid
+signal.
+
+Because there are so many bricks on the screen, the states of the bricks are
+not represented by individual signals. Instead, the states of the bricks are
+stored in a dual-port memory. The Game Controller writes to the memory to 
+add (on startup and reset) or remove (on collisions) bricks. The VGA Controller
+reads the memory as necessary to draw bricks on the screen. The
+game_state_valid signal considers whether the Game Controller has made all the
+necessary writes to the memory, and the game_state_ack signal considers whether
+the VGA Controller has made all the necessary reads.
+
+Engineer's note: The way the valid and ack signals consider the memory is not
+ideal. It could significantly slow the interfacing between the two halves.
+We'll see how it goes.
+
+The VGA Controller presents information about any collisions that occur between
+the ball and the screen walls, bricks, or paddle. This information is presented
+via a FIFO. Each element in the FIFO represents a single collision that was
+detected while the frame was being rendered. 
+
 ## VGA Controller
 
 ### Requirements
