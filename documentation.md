@@ -236,6 +236,14 @@ Controller then cancels any already-playing sounds and begins playing that
 sound. If no sound signals are high, the currently-playing sound, if any, 
 continues playing.
 
+#### Game - Accelerometer
+
+The interface between the Game Controller and ADXL Controller consists solely
+of the numeric readout of the accelerometer. The ADXL constantly samples the
+accelerometer reading and outputs the value on its output signal. The Game
+Controller shifts in the reading as necessary. There is no handshaking between
+the ADXL Controller and Game Controller.
+
 ## VGA Controller
 
 ### Requirements
