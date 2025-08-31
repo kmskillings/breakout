@@ -133,7 +133,10 @@ The design consists of the following four primary sections.
 
 - The "VGA Controller" is responsible for producing the VGA signal output to an
 attached (off-board) VGA display. The VGA controller produces the VGA signal to
-reflect the game state, as provided by the Game Controller.
+reflect the game state, as provided by the Game Controller. The VGA Controller
+also is responsible for detecting pixel-perfect collisions between the ball and
+the walls, bricks, and paddle. Collisions are detected during the VGA raster
+scan and relayed to the Game Controller.
 
 - The "Game Controller" is responsible for calculating and updating the game
 state. The Game Controller considers input recieved from the user buttons and
@@ -168,22 +171,20 @@ vertical position of the paddle is fixed).
 
 Because the VGA controller and Game Controller run at different clock speeds,
 these signals cannot simply be passed between the two clock domains. The
-signals are accompanied by a "game_state_valid" signal, which goes high to
-signal that all game state signals may be shifted into the VGA controller. All
+signals are accompanied by a "game_state_ready" signal, which goes high to
+signal that the Game Controller has finished its calculations. All
 these signals are synchronized through a two-deep synchronizer chain. Once the
-VGA Controller shifts in the game state signals, it raises a "game_state_ack"
-signal, which signals to the Game Controller that the game state signals are
-no longer required. The Game Controller then lowers the game_state_valid
-signal.
+VGA Controller finishes drawing the current frame, it raises the
+"game_state_ack" signal, causing the Game Controller to lower the
+"game_state_ready" signal and begin its next round of calculations.
 
 Because there are so many bricks on the screen, the states of the bricks are
 not represented by individual signals. Instead, the states of the bricks are
 stored in a dual-port memory. The Game Controller writes to the memory to 
 add (on startup and reset) or remove (on collisions) bricks. The VGA Controller
 reads the memory as necessary to draw bricks on the screen. The
-game_state_valid signal considers whether the Game Controller has made all the
-necessary writes to the memory, and the game_state_ack signal considers whether
-the VGA Controller has made all the necessary reads.
+game_state_ready signal is only raised if the Game Controller has made all
+necessary writes to the memory.
 
 Engineer's note: The way the valid and ack signals consider the memory is not
 ideal. It could significantly slow the interfacing between the two halves.
@@ -192,7 +193,26 @@ We'll see how it goes.
 The VGA Controller presents information about any collisions that occur between
 the ball and the screen walls, bricks, or paddle. This information is presented
 via a FIFO. Each element in the FIFO represents a single collision that was
-detected while the frame was being rendered. 
+detected while the frame was being rendered. Each element consists of several
+fields.
+
+- The collision type. This indicates what object the ball collided with.
+Possible values include a wall, a brick, or each section of the paddle.
+
+- The collision direction. This indicates whether the object was above, below,
+to the right, or to the north of the ball when the collision was detected.
+
+- The coordinate of the colliding pixel, that is, the pixel that the ball
+collided with, NOT the pixel OF the ball.
+
+The front element of the FIFO is always presented. If the FIFO is empty, a
+collision_empty signal is high, and the collision fields are don't-care. To
+request the next collision in the FIFO, the Game Controller raises the
+collision_next signal. After a delay, the VGA Controller raises the
+collision_ready signal, whereupon the Game Controller shifts in the collision
+data and lowers the collision_next signal. The VGA controller then lowers the
+collision_ready signal, at which point another collision may be read. All
+signals crossing the clock domain pass through synchronizer chains.
 
 ## VGA Controller
 
