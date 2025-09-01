@@ -6,3 +6,4 @@ transcript
 build/*
 db/*
 incremental_db/*
+ignore/*
