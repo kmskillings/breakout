@@ -248,6 +248,272 @@ the ADXL Controller and Game Controller.
 
 ### Requirements
 
+The following requirements apply to the VGA Controller.
+
+- The VGA image shall include the following features
+
+    - Bricks
+
+        - The upper half of the screen shall be capable of displaying bricks.
+
+        - The odd-numbered rows (Starting from zero, counting down from the
+top) of bricks shall be aligned to the edges of the screen. Each brick shall
+be 16 pixels wide and eight pixels high.
+
+        - The even-numbered rows shall be offset by eight pixels horizontally.
+Each brick shall be 16 pixels wide and eight pixels high, except for the right-
+most and left-most pixels in the row, which shall be 8 pixels wide and eight
+pixels high.
+
+        - The image of each brick shall allow easy visual identification of
+each individual brick.
+
+        - Each brick shall correspond to exactly one entry in the brick memory
+block. Each brick shall appear and disapper according to the binary value
+stored at the appropriate location in the brick memory block.
+
+    - Ball
+
+        - If the game state field ball_active is high, a ball shall appear in
+the image at the location specified by ball_position.
+
+        - The ball shall fit within a bounding box ten pixels wide and ten
+pixels high.
+
+        - The image of the ball shall fit entirely within the bounding box.
+
+        - If the game state field ball_active is low, no ball shall appear in
+the image.
+
+    - Paddle
+
+        - A paddle shall appear at the bottom of the screen at the horizontal
+location specified by paddle_position.
+
+        - The paddle shall be forty pixels wide and ten pixels high.
+
+    - Background
+
+        - Pixels not occupied by bricks, the paddle, or the ball shall be a
+uniform color.
+
+- The VGA Controller shall detect pixel-perfect collisions between the ball
+and the walls, the paddle, or any bricks.
+
+    - A collision shall be considered to occur between the ball and a brick
+when any pixel occupied by a (non-destroyed) brick is in the neighborhood
+(eight orthogonally or diagonally adjacent cells) of any pixel occupied by
+the ball.
+
+Engineer's note: The requirement requires that a collision is detected anytime
+the ball "touches" a brick. A much simpler approach would be to detect a
+collision whenever the ball "overlaps" a brick. However, I favor this approach
+because of its greater challenge and "technical accuracy."
+
+    - A collision shall be considered to occur between the ball and the paddle
+whenever any pixel occupied by the top surface of the paddle is directly below
+any pixel occupied by the ball.
+
+Engineer's note: The requirement means that the ball collides only with the top
+surface of the paddle; the ball does not collide with the sides or any other
+pixel of the paddle.
+
+    - A collision shall be considered to occur between the ball and each wall
+whenever a pixel on the extreme left, right, top, or bottom of the screen is
+occupied by the ball.
+
+    - Whenever a collision is detected, an element containing the following
+fields shall be added to a FIFO.
+
+        - The type of object the ball collided with.
+
+        - The "direction" of the collision, i.e, which of the eight pixels
+adjecent to the ball pixel was occupied by the colliding object.
+
+        - The position of the colliding pixel on the screen.
+
+    - The front element of the collision FIFO shall be presented.
+
+    - Whenever the "collision_next" input signal goes high, the FIFO shall be
+advanced. Once the new element is on the output wires, a "collision_ready"
+signal shall go high. If there are no more elements in the FIFO, a
+"collision_empty" signal shall go high and the collision data signals shall be
+don't-care.
+
+    - Whenever the "collision_next" signal goes low, the "collision_ready"
+signal shall also go low.
+
+    - Once the VGA Controller finishes rasterizing a frame, it shall raise the
+"game_state_ack" signal and keep it raised until the "game_state_ready" input
+signal goes low.
+
+    - The video signal shall conform to the following VGA timing
+specifications.
+
+        - VSYNC: 2 lines
+
+        - HSYNC: 96 pixels
+
+        - Vertical back porch: 33 lines
+
+        - Vertical visible area: 480 lines
+
+        - Vertical front porch: 10 lines
+
+        - Horizontal back porch: 48 pixels
+
+        - Horizontal visible area: 640 pixels
+
+        - Horizontal front porch: 16 pixels
+
+        - Framerate: About 60 Hz
+
+    - During the VSYNC period, the VSYNC output signal shall be low. At all
+other times, the VSYNC output signal shall be high.
+
+    - During the HSYNC period, the HSYNC otuput signal shall be low. At all
+other times, the HSYNC output signal shall be high.
+
+    - During the horizontal and vertical visible area, the VGA Controller shall
+output the color of the current pixel on the three four-bit color outputs. At
+all other times, all three color outputs shall be black (all low).
+
+### Testing
+
+The requirements levied on the VGA Controller are tested by a self-checking
+testbench. All requirements are positively tested. Because the VGA raster
+contains nearly half a million pixels, testing at full scale is impractical.
+Instead, the VGA Controller is tested using a smaller, yet representative
+image.
+
+The following paragraphs describe the tests the self-checking testbench 
+performs.
+
+#### Brick Drawing
+
+The brick-drawing test consists of enabling each brick, one at a time, and
+analyzing the video signal to determine the size and position of the drawn
+brick.
+
+The following flow is performed for each brick:
+
+1. Enable the brick.
+
+2. Analyze the video signal to ensure brick pixels appear only where expected.
+
+3. Disable the brick.
+
+4. Analyze the video signal to ensure no brick pixels appear.
+
+#### Ball Drawing
+
+Overall, the ball-drawing test involves incrementally changing the position of
+the ball and measuring the effect on the timing of the ball-colored pixels in
+the video signal.
+
+The ball coordinates are required to have the following properties:
+
+- A vertical coordinate of zero corresponds to the ball in its extreme upward
+position (touching the top of the screen).
+
+- A vertical coordinate of a extreme positive value (470) corresponds to the
+ball in its extreme downward position (touching the bottom of the screen).
+
+- A change of positive one in the vertical coordinate corresponds to the ball
+moving a single pixel downwards.
+
+- A change of negative one in the vertical coordinate corresponds to the ball
+moving a single pixel upwards.
+
+- A horizontal coordinate of zero corresponds to the ball in its extreme
+leftward position (touching the left side of the screen).
+
+- A horizontal coordinate of an extreme positive value (630) corresponds to the
+ball in its extreme rightward position (touching the right side of the screen).
+
+- A change of positive one in the horizontal coordinate corresponds to the ball
+moving a single pixel rightward.
+
+- A change of negative one in the horizontal coordinate corresponds to the ball
+moving a single pixel leftward.
+
+The test consists of a vertical portion and a horizontal portion. In each
+portion, the appropriate coordinate begins at zero, then is incremented until
+it reaches its maximum value. The video signal is analyzed to determine whether
+the ball moves appropriately. Then, the coordinate is incremented until it
+returns to zero. Again, the video signal is analyzed.
+
+The testbench uses the uppermost or leftmost pixel, as appropriate,
+to measure the position of the ball. The
+vertical position is measured by counting the number of hsync pulses since the
+last vsync pulse. The horizontal positoin is measured by counting the number of
+clock cycles since the last hsync pulse. The testbench accounts for the back
+porch when calculating the position of the ball.
+
+Also, the testbench measures that no pixel of the ball exceeds the ten-by-ten
+bounding box.
+
+#### Paddle Drawing
+
+The paddle-drawing test follows the same overall flow as the ball drawing
+tests, except that motion in one dimension only is required. The vertical
+position of the paddle is measured and required to stay constant.
+
+#### Collision Detection
+
+Collision with the walls can be detected during the ball drawing tests. After
+the frame where the ball is expected to be in the extreme positions, the
+collision FIFO will be read and analyzed to ensure there is at least one
+detected collision with a wall in the appropriate direction, and that there
+are no other collisions.
+
+To detect collisions with the paddle, the ball is placed at the appropriate
+vertical position and wiped horizontally across the screen. The paddle is also
+placed at a certain position. The FIFO is read after every frame. Each pixel is
+required to be "collided with" at least once. Also, for every frame during
+which there is at least one collision, the ball and paddle's positions are
+compared to check whether a collision is feasible.
+
+Engineer's note: Would it be better to do an AABB-collision type check instead?
+
+#### Brick Collision
+
+Collision with the bricks is checked during the brick-drawing tests. While each
+brick is active, the ball is "wiped" along all four edges of the brick. The
+detected collisions are analyzed to check whether all the pixels on each of the
+brick's edges are respresented.
+
+The fact that this has to be repeated for each brick has the potential to make
+the testbench extremely time-consuming.
+
+#### Number of Frame Required
+
+If the testbench is run with a screen one tenth as high and wide as the actual
+screen (64 by 48 pixels), only about 3000 pixels are required to be drawn per
+frame, not counting "off-screen" pixels. The ball has a "rattle room" of 54
+pixels horizontally and 38 pixels vertically. The paddle has a "rattle room"
+of 8 pixels horizontally. There are three rows of bricks. The first and third
+have 4 bricks and the second has 5, for a total of 13 bricks.
+
+At the beginning of the testbench, the ball must be wiped up and down along
+each dimension, requiring 2*54 + 2*38 = 184 frames. Additionally, each of the
+thirteen bricks requires one frame to check for "blankness", one frame to
+measure the brick position and size, and 184 frames to check for collisions.
+Finally, the paddle requires 16 frames to check for motion and 38 frames to
+checks for collisions, for a total of about 2,700 frames. If each frame is
+about 3,000 pixels, this is a total of about 10,000,000 pixels, once off-frame
+pixels and miscellaneous test are accounted for. This is at the upper limit
+of what I would be comfortable testing. If it becomes necessary, the following
+simplifications could be made to reduce the number of required tests:
+
+- Only test collision with one brick, and take the results and representative.
+- Instead of wiping the ball across all four edges of the brick, only test
+three frames per edge: One with the brick's position less that the bricks and
+not colliding, one colliding, and one with the brick's position greater than
+the brick's and not colliding.
+- Test the ball's motion by moving it only one pixel in each direction, rather
+than wiping it across the whole screen.
+
 ### Implementation
 
 ## Game Controller
@@ -266,4 +532,4 @@ the ADXL Controller and Game Controller.
 
 ### Requirements
 
-### Implementation
+#mentation
