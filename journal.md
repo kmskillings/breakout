@@ -261,7 +261,7 @@ in I only got a black screen and a cursor. Trying to diagnose the problem by
 looking through journalctl and whatnot yielded no leads. Eventually, I decided
 to just bite the bullet and reinstall Cinnamon.
 
-After reinstalling, everything seems to be working correctly. Here's hoping
+After reinstalling, everything seems to be working correctly. Here's hopig
 that it will be clear sailing from here.
 
 ### Planning
@@ -270,3 +270,46 @@ The next step in this project is to document my overall plan for the project,
 and start to flesh out the details of the blocks and interfaces. The details
 will be recorded in the file documentation.md.
 
+## September 1, 2025
+
+Now that I've gotten the main part of the VGA Controller documented, I'm ready
+to start coding. Originally, I wanted to get the entire system planned out
+before starting coding, but planning is boring, and I want to write some code.
+
+The first step still isn't coding, though. Because the DE10-Lite runs on a 
+50-MHz clock and the VGA 640x480 standard demans a 25.175-MHz clock, I first
+need to set up a PLL to generate the pixel clock. I know how to do this in the
+Quartus GUI, but I want to do it from the command line if at all possible.
+
+Another decision I need to make at this point is what language to do this
+project in. My tooling supports VHDL, Verilog, and SystemVerilog. I am much
+more familiar with VHDL, since that is what I worked with most recently. I'm
+considering using Verilog, or even SystemVerilog, to build my familiarity with
+them. But with this project, I mainly want to test my ability to plan and
+implement a project, not necessarily learn the idiosyncracies of a new (to me)
+language.
+
+A quick Google search showed that SystemVerilog seems to be the direction
+things are going in industry. In accordance, I will use SystemVerilog for this
+project.
+
+But first things first, I need to get my PLL set up. It looks like I can do
+this by directly instantiating an IP block directly in Verilog. I found an
+example online, but I don't really understand it, so I guess I have to start
+relearning Verilog first.
+
+I drafted the foundation of the VGA controller code. It should generate a VGA
+signal in which the entire visible area is white. I really wish I was writing
+VHDL, so I could use all my different typing tricks and whatnot. Oh well. Maybe
+I'll learn the equivalent Verilog tricks over the course of this project.
+
+My code is pretty ugly. There's a lot of code repetition, especially in the way
+I detect what phase of the raster scan the controller is in. I suppose I could
+extract all that into a separate module and just instantiate it. Maybe I'll do
+that later. Also, my code is unnecessarily verbose. Like, there's a part where
+I use an always block to just 'not' a signal using if-else-if. But at this
+stage, I'd rather be as explicit as I can.
+
+The next step is to write a testbench for my barebones VGA controller. I could
+just compile it and see if it works, but I know it's probably wrong, so why not
+write the testbench now so I can debug it now.
