@@ -313,3 +313,13 @@ stage, I'd rather be as explicit as I can.
 The next step is to write a testbench for my barebones VGA controller. I could
 just compile it and see if it works, but I know it's probably wrong, so why not
 write the testbench now so I can debug it now.
+
+## September 5, 2025
+
+So, after some time to think about it, I decided to factor out the phase-
+detection code after all. This is a task that the VGA controller will need
+to repeat many times. Also, making a separate module will allow me to test it
+individually.
+
+I also thought more about the pipelining structure of the VGA controller. I
+have updated documentation.md to reflect my new ideas.

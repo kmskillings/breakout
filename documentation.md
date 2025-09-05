@@ -520,46 +520,31 @@ The VGA controller starts with two counters. The first, the horizontal counter,
 counts with each clock cycle. The second, the vertical counter, counts when the
 vertical counter rolls over.
 
-The next stage analyzes the counters to determine the current phase of the VGA
-raster scan. If the raster scan is in the "visible area" phase, the two counts
-become the coordinates of the current pixel.
+The next stage determines which objects, if any, the current pixel is part of,
+and the coordinates of the current pixel relative to those objects. This will
+allow future stages to detect collisions and select the color of the pixel
+from textures.
 
-Note that the above means that the raster scan starts with the visible area
-phase, not the sync phases. This is acceptable; only the relative sequence of
-the phases is important. Which phase is the first to appear on reset in not
-important.
+This is achieved by a set of "range counters." These range counters watch for a
+counter input to hit a certain level, at which point the range counter's output
+turns on. The range counter itself then begins counting up from zero to a
+predetermined maximum, at which the range counter's output turns off again.
+The range counter's count is also output and can be used to map textures.
 
-The different objects that can appear onscreen are represented by "masks." Each
-mask is a 2d-array of binary values that "appear" in a certain area of the
-visible image. There are two types of masks: Ones used to draw objects on the
-screen and ones used to detect collisions. Some masks serve both functions.
+The following objects are represented by range counters:
 
-The masks are:
+- The horizontal and vertical sync periods of the raster scan
 
-- All appearing bricks are represented by a single mask that serves both
-functions.
+- The visible image periods of the raster scan
 
-- The ball's image is represented by a drawing mask.
+- The image of the ball
 
-- The paddle's image is represented by a drawing mask.
+- The image of the paddle
 
-- The ball's collision behavior is represented by eight separate collision
-masks, each one offset by one pixel in a different (orthogonal or diagonal)
-direction.
+- Eight ball colliders, each offset a single pixel in a different orthogonal
+or diagonal direction
 
-- The paddle's collision behavior is represented by a collision mask.
-
-- Each wall has a collision mask, but these masks collide with the ball's image
-mask, not its collision masks.
-
-In the third stage, logic determines which masks are active for the current
-pixel. In parallel, the color of the pixel corresponding to each image layer
-is determined. Note that, at this point, it is not known which, if any, image
-will be drawn.
-
-In the fourth stage, the collision masks are compared to detect collisions,
-and collision date is placed into the FIFO. In parallel, the final color of the
-final pixel is calculated. The color is placed on the VGA output pins.
+- The paddle collider
 
 ## Game Controller
 
