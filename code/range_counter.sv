@@ -8,6 +8,18 @@
 //
 // The "turn-on count" of the Range Counter can be loaded by asserting
 // a "load" input. This also causes all the outputs to clear.
+//
+// The following requirements apply to this module:
+// - On any tick where the enable input is active and the counter input equals
+// the loaded on_count value, the active output shall go high.
+// - After the active output goes high, the active output shall go low after
+// a number of "enabled" ticks, that is, ticks during which the enable input
+// is high, equal to the range_duration parameter.
+// - During any tick where the load input is high, the value on the on_count
+// input shall be loaded into the on_count register.
+// - All outputs shall be set to zero on any tick during which the load input
+// is high.
+// - The on_count input shall have no effect if the load input is not high.
 
 module range_counter #(
 	parameter counter_width,
