@@ -19,6 +19,7 @@ module range_counter #(
 	input logic [counter_width - 1:0] 	load,
 	input logic				on_count,
 	input logic [counter_width - 1:0]	counter,
+	input logic				enable,
 	output logic				active,
 	output logic [elapsed_width - 1:0]	elapsed
 );
