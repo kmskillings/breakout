@@ -7,7 +7,8 @@ Breakout project.
 
 ### Genesis
 
-This project was conceived in January of 2024, shortly after I had turned in my final project for my Reconfigurable Computing class. I was overall unhappy with
+This project was conceived in January of 2024, shortly after I had turned in my
+final project for my Reconfigurable Computing class. I was overall unhappy with
 my final product, and consulted with my instructor, Dr. Phillips, about how to
 continue to develop my FPGA skills. He recommended revisiting the project at a
 later date, with more careful planning and less deadline pressure. I made plans
@@ -18,25 +19,12 @@ Breakout project. I wanted to do the project primarily for fun, as a hobby, but
 I also realized that this project would look good in a portolio when I applied
 for an FPGA job someday.
 
-I knew I wanted to do this project "right," that is, to use the most modern and
-relevant tooling I could, use good project planning, and practice any other
-skills relevant to "real" FPGA programming.
-
-### Installing Linux
-
-I decided that doing this project "right" would mean using a Linux environment. I wanted the chance to learn tools like Vim and Quartus Prime's command line
-interface. I had been wanting to start transitioning to Linux anyway,
-considering the upcoming end-of-support for Windows 10 and my absolute refusal
-to put up with Microsoft's shenanigans. I selected Linux Mint for my new system
-because it was frequently recommended as a good Linux distro for beginners. I
-successfully installed it onto a new 250-GB partition on my hard drive. Getting
-Mint to work with my wifi adapter was a challenge, but eventually I got it
-working.
-
-## August 8, 2025
-
-The next step was to create a Github repo for this project and connect it to my new Linux system. It had been some time since I had used git or Github in any
-serious capacity, but I followed the instructions and got everything working.
+The project quickly stalled out, due in part to shifting priorities in my
+personal life and my self-imposed pressure to write full specifications and
+tests before writing even a single line of actual code. In September of 2026,
+I decided to revisit the project again, but using a more agile-like development
+methodology that would allow me to demonstrate my understanding of good
+engineering principles while still being fun as a hobby.
 
 ### Requirements
 
@@ -78,248 +66,21 @@ control the paddle. As a result, this project will target the 10DE-Lite board.
 This also means that this project will use Intel's Quartus Prime design
 software.
 
-### Tooling
+### Tooling and Environment
 
-The next step is to get my tooling set up.
-
-Because I am using the DE10-Lite board, I'm locked into using Intel's Quartus
-software suite. I downloaded and installed the latest version, which went
-surprisingly smoothly.
-
-I want to validate my tooling, to make sure I have everything I need and I know
-how to use it. To acheive this, I will do a simple "blinky" project. Everything
-for this project will be located in a separate test/blinky branch of the repo.
-
-First, I will create the VHDL code for the blinky project. I will use VHDL
-becuase it is the HDL I am most familiar with, and the emphasis of this first
-test is not learning a new HDL.
+I will write this project in VHDL, since it's the HDL I'm most familiar with
+and also the one I like the best. I will use Quartus Prime for synthesis and
+programming, and Questa for simulation. I will rely primarily on their command
+line interfaces, called via Make.
 
 ### Blinky
 
-The code is very simple. The design consists of a single file that counts clock
-cycles. When the clock reaches a certain value, the LED is turned on. When the
-clock reaches another value, the LED is turned off. The values are tuned to
-blink the LED at a rate of 500 mHz and a duty cycle of 50% (On for one second,
-off for one second).
+To validate my toolchain, I have created a simple Blinky project. The project
+is identical to the one I created in August of last year, so I know the code is
+correct.
 
-### Licensing, Questa, and Compilation
+### Toolchain Validation
 
-After I drafted the code for Blinky, I had to compile it. I am most accustomed
-to Modelsim, but it appears that Modelsim has been replaced with Questa.
-
-I downloaded and ran the Quartus Prime 24.1 installed, which also installed
-Questa. When I tried running Questa from the command line (via the vsim
-executable), it informed me that I would need a license.
-
-After going through the whole rigamarole to get a free Questa license, I
-downloaded it, added in to my ENV, and was able to launch Questa in GUI mode.
-It looks identical to the Modelsim I remember. I used the GUI to compile my
-Blinky code and correct a few syntax errors.
-
-Next, I want to use the command line to compile and simulate my designs, but it
-looks like this will have to be a topic for another time.
-
-## August 9, 2025
-
-### Asynchronous Reset with Synchrounous De-Assert
-
-After a bit of time to think, I realized I should update my Blinky code to have
-asynchronous reset with synchronous de-assert. I made the appropriate change to
-the code. I compiled the code using vcom from the command line and corrected
-the syntax errors.
-
-### Self-Checking Testbench for Blinky
-
-Next, I need to write a testbench for my blinky program. Ideally, the testbench
-will be completely self-checking, so I can (in the ideal case) test the module
-completely from the command line.
-
-The testbench will start by holding the DUT in reset for a certain number of
-clock ticks, to make sure everything is correctly initialized. It will then
-release the reset and provide the DUT with a clock signal. The testbench will
-include the following checks:
-
-- The period of the blinker is 2 seconds, as measured between one rising edge
-of the output and the next rising edge of the output.
-- The duty cycle of the blinker is 50%, as measured by the output being high
-50% of the time and low the other 50%.
-- Asserting the reset causes the output to immediately go low. The above tests
-are then repeated.
-
-I drew up an outline of the testbench and immediately noticed a problem: The
-testbench takes way too long to run. I probably should have predicted this.
-The issue is having to simulate all hundred million ticks per period. I'll
-have to find a way to reduce the number of ticks that have to be simulated.
-
-The obvious way to do this would be to pass in generics that determine the
-period and clock frequency of the blinker. Then, in the testbench, I could pass
-in a much shorter blinker period (or lower flock frequency). Then, in the
-"real" version, I would either wrap blinky.vhdl in some kind of top-level
-module to passin the "real" values, or set the defaults to the real values.
-
-Overall, I like the second approach better.
-
-## August 10, 2025
-
-### Finishing Testbench
-
-I decided that the overall structure of the testbench will be to have a single
-process that conducts all the tests. Each test, in addition to any interface
-signals it requires, also outputs two signals:
-
-- A "Complete" signal.
-- A "Passed" signal.
-
-The "Complete" signal is set to 1 immediately after the test finishes its 
-tasks. The "Passed" signal is either set or reset depending on the results of
-the test.
-
-Then, a separate process waits until every test is complete, then checks their
-passed signals. If all the tests passed, the testbench reports that the design
-is OK and finishes. Otherwise, the testbench reports a bad design and finishes.
-
-I hope that this overall testbench structure will allow a variety of well-
-organized, flexible testbenches throughout this project.
-
-### Makefile
-
-After finishing up the testbench and verifying it works in the Questa GUI,
-I create a Makefile to automate the compilation and simulation of my design.
-It is extremely basic, but still helps. I expect that my Makefiles will become
-more sophisticated as the project grows.
-
-## August 12, 2025
-
-### Project Setup
-
-The next step is to set up a Quartus project, will all the associated settings
-and whatnot. Ideally, I'd like to keep my usage of the Quartus GUI to a
-minimum and create the files manually, then run the flow steps from the command
-line or a Makefile. I know this isn't super practical, but I want to understand
-Quartus, rather than just memorizing the magic combination of button presses,
-and going command-line-only seems like a good way to do that.
-
-I couldn't find very good documentation on the setup of the QSF file and other
-topics, so I will heavily reference a "test project" I made.
-
-First comes the .qsf, which contains (most of?) the project settings.
-
-Next is the .sdc, which contains the timing constraints. Both the button input
-and output LED are unconstrained, so the only thing that needs to go in the
-.sdc is the clock.
-
-The next step was to make sure I could fully synthesize, place and route, and
-assemble the design using the command line. I referenced the "Flow Log" of a
-test project and added them to the Makefile.
-
-### Programming the Device
-
-The final step was to program my DE10-Lite. This was a massive headache.
-
-When I plugged in my FPGA, it showed up in the programming menu as a USB
-Blaster, just as it was supposed to. But I couldn't do anything with it. After
-reading some sketchy-ass forums online, I determined that my problem was that
-the JTAG programmer daemon needed root access, which I needed to add via a udev
-rule. I'm sure I'll learn someday what a udev rule is, but in this case I had
-no idea. But I copied and pasted a file from the Internet that seemed to work
-fine.
-
-
-`SUBSYSTEM=="usb", 
-
-ENV{DEVTYPE}=="usb_device", 
-
-ATTR{idVendor}=="09fb", 
-
-ATTR{idProduct}=="6001", 
-
-MODE="0666", 
-
-NAME="bus/usb/$env{BUSNUM}/$env{DEVNUM}", 
-
-RUN+="/bin/chmod 0666 %c" `
-
-Finally, I studied the options for the quartus_pgm command and added two
-versions to the Makefile: One for programming just the FPGA using a .sof, and
-one for programming the configuration EEPROM using a .pof.
-
-### Final Blinky project
-
-After programming the FPGA, everything worked correctly, except that the logic
-sense of the reset button was inverted. After fixing this in the code,
-Blinky was complete, and my toolchain was validated and ready to begin the
-actual project!
-
-## August 30, 2025
-
-### More Linux Troubles
-
-My project stalled out since I started having trouble with my Linux install.
-For some reason, it looks like the udev rule for the USB blaster was
-iterfering with Cinnamon, and whenever I started my computer, after logging
-in I only got a black screen and a cursor. Trying to diagnose the problem by
-looking through journalctl and whatnot yielded no leads. Eventually, I decided
-to just bite the bullet and reinstall Cinnamon.
-
-After reinstalling, everything seems to be working correctly. Here's hopig
-that it will be clear sailing from here.
-
-### Planning
-
-The next step in this project is to document my overall plan for the project,
-and start to flesh out the details of the blocks and interfaces. The details
-will be recorded in the file documentation.md.
-
-## September 1, 2025
-
-Now that I've gotten the main part of the VGA Controller documented, I'm ready
-to start coding. Originally, I wanted to get the entire system planned out
-before starting coding, but planning is boring, and I want to write some code.
-
-The first step still isn't coding, though. Because the DE10-Lite runs on a 
-50-MHz clock and the VGA 640x480 standard demans a 25.175-MHz clock, I first
-need to set up a PLL to generate the pixel clock. I know how to do this in the
-Quartus GUI, but I want to do it from the command line if at all possible.
-
-Another decision I need to make at this point is what language to do this
-project in. My tooling supports VHDL, Verilog, and SystemVerilog. I am much
-more familiar with VHDL, since that is what I worked with most recently. I'm
-considering using Verilog, or even SystemVerilog, to build my familiarity with
-them. But with this project, I mainly want to test my ability to plan and
-implement a project, not necessarily learn the idiosyncracies of a new (to me)
-language.
-
-A quick Google search showed that SystemVerilog seems to be the direction
-things are going in industry. In accordance, I will use SystemVerilog for this
-project.
-
-But first things first, I need to get my PLL set up. It looks like I can do
-this by directly instantiating an IP block directly in Verilog. I found an
-example online, but I don't really understand it, so I guess I have to start
-relearning Verilog first.
-
-I drafted the foundation of the VGA controller code. It should generate a VGA
-signal in which the entire visible area is white. I really wish I was writing
-VHDL, so I could use all my different typing tricks and whatnot. Oh well. Maybe
-I'll learn the equivalent Verilog tricks over the course of this project.
-
-My code is pretty ugly. There's a lot of code repetition, especially in the way
-I detect what phase of the raster scan the controller is in. I suppose I could
-extract all that into a separate module and just instantiate it. Maybe I'll do
-that later. Also, my code is unnecessarily verbose. Like, there's a part where
-I use an always block to just 'not' a signal using if-else-if. But at this
-stage, I'd rather be as explicit as I can.
-
-The next step is to write a testbench for my barebones VGA controller. I could
-just compile it and see if it works, but I know it's probably wrong, so why not
-write the testbench now so I can debug it now.
-
-## September 5, 2025
-
-So, after some time to think about it, I decided to factor out the phase-
-detection code after all. This is a task that the VGA controller will need
-to repeat many times. Also, making a separate module will allow me to test it
-individually.
-
-I also thought more about the pipelining structure of the VGA controller. I
-have updated documentation.md to reflect my new ideas.
+The vcom command were still working correctly, but vsim was reporting that my
+license had expired. I had expected this. I acquired a new license and
+confirmed that my toolchain was still working as expected.
