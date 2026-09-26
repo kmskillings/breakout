@@ -45,9 +45,9 @@ architecture tb of blinky_tb is
 		signal reset : out std_logic
 	) is
 	begin
-		reset <= '1';
-		wait for init_reset_time;
 		reset <= '0';
+		wait for init_reset_time;
+		reset <= '1';
 	end procedure;
 
 	procedure check_period (
@@ -82,7 +82,7 @@ architecture tb of blinky_tb is
 	begin
 		wait until output = '1';
 		wait for reset_test_delay;
-		reset <= '1';	
+		reset <= '0';	
 		wait for 1 ns;
 		if output = '0' then
 			passed <= '1';
@@ -90,7 +90,7 @@ architecture tb of blinky_tb is
 			passed <= '0';
 		end if;
 		wait for reset_test_duration;
-		reset <= '0';
+		reset <= '1';
 		complete <= '1';	
 	end procedure;
 
