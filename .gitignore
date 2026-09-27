@@ -1,2 +1,2 @@
-./test/compiles/*
-./test/vsim/*
+/test/compiles/*
+/test/vsim/*
