@@ -1,2 +1,3 @@
 /test/compiles/*
 /test/vsim/*
+/build/*
