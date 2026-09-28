@@ -1,3 +1,5 @@
 /test/compiles/*
 /test/vsim/*
 /build/*
+/test/logs/*
+/test/passes/*
