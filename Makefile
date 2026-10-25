@@ -29,7 +29,7 @@ test_passes := ${names_modules:%=${dir_test_passes}/%.pass}
 all: ${test_passes}
 
 ${test_passes}: ${dir_test_passes}/%.pass: ${dir_test_logs}/%.log
-	grep "TEST_FAILURE" $< || touch $@
+	grep "TEST_SUCCESS" $< && touch $@
 
 ${test_logs}: ${dir_test_logs}/%.log: ${dir_test_compiles}/%.vhdl.test_compile ${dir_test_compiles}/%.tb.vhdl.test_compile
 	vsim -c -lib ${dir_test_work} -do "run -all; exit" $*_tb | tee $@
@@ -48,3 +48,4 @@ clean:
 	find ${dir_test_compiles} -maxdepth 1 -name "*.test_compile" -delete
 	find ${dir_test_work} -name "*" -delete
 	find ${dir_test_logs} -maxdepth 1 -name "*.log" -delete
+	find ${dir_test_passes} -maxdepth 1 -name "*.pass" -delete

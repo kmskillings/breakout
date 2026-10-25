@@ -84,3 +84,5 @@ correct.
 The vcom command were still working correctly, but vsim was reporting that my
 license had expired. I had expected this. I acquired a new license and
 confirmed that my toolchain was still working as expected.
+
+
