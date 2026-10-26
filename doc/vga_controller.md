@@ -69,27 +69,51 @@ All color outputs shall be registered on the rising edge of the clock.
 All outputs of the VGA controller shall immediately go low on assertion of the
 reset signal and remain low for as long as the reset signal is asserted.
 
-#### Wake-up From Reset
+### Horizontal VGA Waveform
 
-The VGA controller shall show activity on one or more of the output signals, consistent with the other requirements of this specification, no longer than one millisecond after deassertion of the reset signal.
+> The horizontal waveform consists of four distinct phases:
+> - Sync period
+> - Back porch
+> - Visible image area
+> - Front porch
+>
+> During the sync period, the sync output and the color outputs are held low.
+> During the back porch, the sync output is high and the color outputs are held low.
+> During the visible image area, the sync output is high and no requirements apply to the color outputs.
+> During the front porch, the sync output is high and the color outputs are held low.
+> 
+> Conceptually, the first phase of the cycle is the sync period. However, because the sync
+> outputs are low during reset, the first full phase after the device comes out of reset is the back porch.
+>
+> The requirements of this specification define the waveform in terms of the edges of the sync output and activity on the color outputs. This provides a complete description of the VGA waveform in a way that is easy to test in a VHDL testbench.
 
-### Sequencing
+#### Wake-Up From Reset
 
-#### Horizontal Sync
+The elapsed time from the rising edge of the reset input to the subsequent falling edge of the horizontal sync output shall be no greater than 100 ms.
 
-The duration of the horizontal sync phase shall be 3.79 to 3.83 us. During this period, the horizontal sync output shall be low. At all other times, the horizontal sync output shall be high. During the horizontal sync period, the color output shall be all low.
+> This requirement requires a falling edge, not a rising one. Since the sync output is held low during reset, this implies that a rising edge must occur sometime in this 100 ms as well. The behavior of the color output during this 100-ms period is not specified. This is because VGA monitors, and therefore this specification, are only interested in the steady-state waveform behavior. Any "blips" or irregular behavior following reset are irrelevant, as long as the waveform is correct beginning with the first sync period.
+
+#### Horizontal Cycle Period
+
+The elapsed time from each falling edge of the horizontal sync output to the subsequent falling edge of the horizontal sync output shall be no less than 31.7 us and no greater than 31.9 us, unless the reset input is driven low within 31.7 us of the first falling edge. In this case, the Reset State requirement shall apply.
+
+> This requirement defines the total period of the horizontal cycle because each cycle begins with a falling edge of the sync output.
+
+#### Sync Period
+
+The elapsed time from each falling edge of the horizontal sync output to the subsequent rising edge of the horizontal sync output shall no less than 3.80 us and no greater than 3.83 us, unless the reset input is driven low within 3.80 us of the falling edge. In this case, the Reset State requirement shall apply.
+
+#### Behavior of Color Outputs During Sync Phase
+
+Whenever the horizontal sync output is low, the color outputs shall be all-low.
 
 #### Horizontal Back Porch
 
-Following the horizontal sync period, the color output shall be all low for no shorter than 1.585 us.
+Following each rising edge of the horizontal sync output, the color outputs shall be all-low for no shorter than 1.585 us. This requirement does not apply during the period between the rising edge of the reset input and the subsequent falling edge of the horizontal sync output.
 
 #### Horizontal Front Porch
 
-Prior to the horizontal sync period, the color output shall be all low for no shorter than 316 ns.
-
-#### Horizontal Scan Period
-
-The duration of the horizontal scan, defined as the period between one rising edge of the horizontal sync output and the following rising edge of the horizontal sync output, shall be 31.6 to 31.9 us.
+Prior to each falling edge of the horizontal sync output, the color outputs shall be all-low for no shorter than 317 ns. This requirement does not apply during the period between the rising edge of the reset input and the subsequent falling edge of the horizontal sync output. 
 
 #### Vertical Sync
 
