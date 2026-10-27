@@ -16,15 +16,7 @@ architecture rtl of vga_controller is
 
 begin
 
-process(reset, clock)
-begin
-    if reset = '0' then
-        v_sync <= '0';
-    elsif rising_edge(clock) then
-        v_sync <= '1';
-    end if;
-end process ; -- 
-
+v_sync <= '0';
 h_sync <= '0';
 color <= (others => '0');
 
