@@ -66,6 +66,10 @@ All color outputs shall be registered on the rising edge of the clock.
 
 #### Reset State
 
+All outputs of the VGA controller shall go low exactly one delta cycle following each falling edge of the reset input. All outputs shall remain low for as long as the reset input is held low. All outputs shall also remain low for no fewer than one delta cycles following the subsequent rising ege of the reset input.
+
+> The exactly-one-delta-cycle aspect of this requirement captures the idea that the outputs react "immediately" to the reset signal. If the outputs go low on the same delta cycle that the reset does, it means the DUT somehow guessed when the reset signal would go low, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the reset and the outputs.
+
 All outputs of the VGA controller shall immediately go low on assertion of the
 reset signal and remain low for as long as the reset signal is asserted.
 
