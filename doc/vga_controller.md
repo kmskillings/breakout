@@ -68,9 +68,12 @@ Each individual output signal shall have a state of either '0' or '1' at all tim
 
 #### Output Registration
 
-Each transition of an individual output signal shall occur exactly one delta cycle after a rising edge of the clock input.
+Each transition of an individual output signal shall occur either:
+- Exactly one delta cycle after a rising edge of the clock input.
+- Exactly one delta cycle after a falling edge of the reset input.
+This requirement shall not apply during the first two delta cycles of the simulation.
 
-> This requirement captures the concept that the outputs are registered on the rising edge of the clock. If the outputs change on the same delta cycle as the rising edge of the clock, it means the DUT somehow guessed when the clock would go high, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the register and the output.
+> This requirement captures the concept that the outputs are registered on the rising edge of the clock. If the outputs change on the same delta cycle as the rising edge of the clock, it means the DUT somehow guessed when the clock would go high, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the register and the output. The exception for the first two cycles of the simulation is to prevent false failures from resulting when the outputs change from their undefined value to their reset-state value.
 
 ## Performance
 
