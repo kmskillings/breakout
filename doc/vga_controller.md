@@ -60,6 +60,18 @@ organized into three sets of four:
 - Blue Intensity
 All color outputs shall be registered on the rising edge of the clock.
 
+#### Output States
+
+Each individual output signal shall have a state of either '0' or '1' at all times after the first delta cycle of the simulation.
+
+> The outputs are not required to have a '0' or '1' value during the first delta cycle. They are allowed one delta cycle to settle from 'U' (or similar) to either '0' or '1'.
+
+#### Output Registration
+
+Each transition of an individual output signal shall occur exactly one delta cycle after a rising edge of the clock input.
+
+> This requirement captures the concept that the outputs are registered on the rising edge of the clock. If the outputs change on the same delta cycle as the rising edge of the clock, it means the DUT somehow guessed when the clock would go high, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the register and the output.
+
 ## Performance
 
 ### Reset Behavior
