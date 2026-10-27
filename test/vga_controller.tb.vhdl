@@ -21,14 +21,14 @@ architecture tb of vga_controller_tb is
     constant horizontal_front_porch_duration_min : time := 316 ns;
 
     -- DUT interface signals
-    signal clock : std_logic;
-    signal reset : std_logic;
+    signal clock : std_logic := '0';
+    signal reset : std_logic := '0';
     signal v_sync : std_logic;
     signal h_sync : std_logic;
     signal color : std_logic_vector(11 downto 0);
 
     signal reset_delay_1_dt : std_logic;
-
+    signal clock_delay_1_dt : std_logic;
     signal first_dt_has_passed : std_logic := '0';
 
     constant initial_reset_hold : time := 50 ns;
@@ -59,7 +59,33 @@ CHECK_COLOR_STATES : for i in 11 downto 0 generate
         severity failure;
 end generate;
 
+clock_delay_1_dt <= clock;
 reset_delay_1_dt <= reset;
+
+assert 
+        rising_edge(first_dt_has_passed) or
+        not(v_sync'event)                or 
+        rising_edge(clock_delay_1_dt)    or 
+        falling_edge(reset_delay_1_dt)
+    report "TEST_FAILURE: Output v_sync changed asynchronously with clock and reset."
+    severity failure;
+assert 
+        rising_edge(first_dt_has_passed) or
+        not(h_sync'event)                or 
+        rising_edge(clock_delay_1_dt)    or 
+        falling_edge(reset_delay_1_dt)
+    report "TEST_FAILURE: Output h_sync changed asynchronously with clock and reset."
+    severity failure;
+CHECK_COLOR_REG : for i in 11 downto 0 generate
+    assert 
+            rising_edge(first_dt_has_passed) or
+            not(color(i)'event)              or 
+            rising_edge(clock_delay_1_dt)    or 
+            falling_edge(reset_delay_1_dt)
+        report "TEST_FAILURE: Output color(" & integer'image(i) & ") changed asynchronously with clock and reset."
+        severity failure;
+end generate ; -- CHECK_COLOR_REG
+
 assert reset_delay_1_dt /= '0' or or(color) = '0'
     report "TEST_FAILURE: Color output failed to respect reset assertion."
     severity failure;
