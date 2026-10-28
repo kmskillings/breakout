@@ -71,7 +71,7 @@ Each individual output signal shall have a state of either '0' or '1' at all tim
 Each transition of an individual output signal shall occur either:
 - Exactly one delta cycle after a rising edge of the clock input.
 - Exactly one delta cycle after a falling edge of the reset input.
-This requirement shall not apply during the first two delta cycles of the simulation.
+This requirement does not apply during the first two delta cycles of the simulation.
 
 > This requirement captures the concept that the outputs are registered on the rising edge of the clock. If the outputs change on the same delta cycle as the rising edge of the clock, it means the DUT somehow guessed when the clock would go high, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the register and the output. The exception for the first two cycles of the simulation is to prevent false failures from resulting when the outputs change from their undefined value to their reset-state value.
 
@@ -81,7 +81,7 @@ This requirement shall not apply during the first two delta cycles of the simula
 
 #### Reset State
 
-All outputs of the VGA controller shall go low exactly one delta cycle following each falling edge of the reset input. All outputs shall remain low for as long as the reset input is held low. All outputs shall also remain low for no fewer than one delta cycles following the subsequent rising ege of the reset input.
+All outputs of the VGA controller shall go low within one delta cycle following each falling edge of the reset input. All outputs shall remain low for as long as the reset input is held low. All outputs shall also remain low for no fewer than one delta cycles following the subsequent rising ege of the reset input.
 
 > The exactly-one-delta-cycle aspect of this requirement captures the idea that the outputs react "immediately" to the reset signal. If the outputs go low on the same delta cycle that the reset does, it means the DUT somehow guessed when the reset signal would go low, rather than reacting to it. More than one delta cycle is not acceptable because this would indicate a cascade of combinational logic between the reset and the outputs.
 
@@ -108,7 +108,7 @@ reset signal and remain low for as long as the reset signal is asserted.
 
 #### Wake-Up From Reset
 
-The elapsed time from the rising edge of the reset input to the subsequent falling edge of the horizontal sync output shall be no greater than 100 ms.
+The elapsed time from each rising edge of the reset input to the subsequent falling edge of the horizontal sync output shall be no greater than 100 ms. This requirement does not apply if the reset input is driven low during the 100-ms period.
 
 > This requirement requires a falling edge, not a rising one. Since the sync output is held low during reset, this implies that a rising edge must occur sometime in this 100 ms as well. The behavior of the color output during this 100-ms period is not specified. This is because VGA monitors, and therefore this specification, are only interested in the steady-state waveform behavior. Any "blips" or irregular behavior following reset are irrelevant, as long as the waveform is correct beginning with the first sync period.
 
@@ -120,7 +120,7 @@ The elapsed time from each falling edge of the horizontal sync output to the sub
 
 #### Sync Period
 
-The elapsed time from each falling edge of the horizontal sync output to the subsequent rising edge of the horizontal sync output shall no less than 3.80 us and no greater than 3.83 us, unless the reset input is driven low within 3.80 us of the falling edge. In this case, the Reset State requirement shall apply.
+The elapsed time from each falling edge of the horizontal sync output to the subsequent rising edge of the horizontal sync output shall no less than 3.80 us and no greater than 3.83 us. This requirement does not apply while the reset input is driven low. Additionally, this requirement does not apply if the reset input is driven low within 3.83 us of the falling edge of the horizontal sync output.
 
 #### Behavior of Color Outputs During Sync Phase
 
@@ -128,7 +128,7 @@ Whenever the horizontal sync output is low, the color outputs shall be all-low.
 
 #### Horizontal Back Porch
 
-Following each rising edge of the horizontal sync output, the color outputs shall be all-low for no shorter than 1.585 us. This requirement does not apply during the period between the rising edge of the reset input and the subsequent falling edge of the horizontal sync output.
+Following each rising edge of the horizontal sync output, the color outputs shall be all-low for no shorter than 1.585 us. This requirement does not apply during the period between the rising edge of the reset input and the subsequent falling edge of the horizontal sync output. Additionally, this requirement does not apply if the reset input is driven low within 1.585 us of the first rising edge.
 
 #### Horizontal Front Porch
 
